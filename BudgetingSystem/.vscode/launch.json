@@ -2,17 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug elec1final",
-            "type": "cppdbg",
+            "type": "java",
+            "name": "Debug BudgetingSystem",
             "request": "launch",
-            "program": "${workspaceFolder}/elec1final.exe",
-            "args": [],
-            "stopAtEntry": false,
+            "mainClass": "BudgetingSystem",
+            "projectName": "BudgetingSystem",
             "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": true,
-            "MIMode": "gdb",
-            "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe"
+            "console": "externalTerminal"
         }
     ]
 }

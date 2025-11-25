@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +14,7 @@ public class BudgetingSystem {
         frame = new JFrame("Budgeting Program");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
-        frame.setLocationRelativeTo(null); // Center the frame on the screen
+        frame.setLocationRelativeTo(null);
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
@@ -32,7 +30,7 @@ public class BudgetingSystem {
 
         frame.add(mainPanel);
         frame.setVisible(true);
-        frame.setResizable(false); // Prevent resizing
+        frame.setResizable(false);
     }
 
     private void initializeUserRolePanel() {
@@ -40,7 +38,7 @@ public class BudgetingSystem {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon bg = new ImageIcon("acc_bg.jpeg"); // Background for User role panel
+                ImageIcon bg = new ImageIcon(getClass().getResource("acc_bg.jpeg"));
                 g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -56,7 +54,6 @@ public class BudgetingSystem {
         adminButton.addActionListener(e -> cardLayout.show(mainPanel, "Admin Menu"));
         exitButton.addActionListener(e -> System.exit(0));
 
-        // Adding components with GridBagConstraints
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0;
@@ -75,7 +72,7 @@ public class BudgetingSystem {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon bg = new ImageIcon("acc_bg.jpeg"); // Background for Student panel
+                ImageIcon bg = new ImageIcon(getClass().getResource("acc_bg.jpeg"));
                 g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -109,7 +106,7 @@ public class BudgetingSystem {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon bg = new ImageIcon("admin_bg.jpeg"); // Background for Admin login panel
+                ImageIcon bg = new ImageIcon(getClass().getResource("admin_bg.jpeg"));
                 g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -147,7 +144,7 @@ public class BudgetingSystem {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon bg = new ImageIcon("menu_bg.jpeg"); // Background for Program Menu
+                ImageIcon bg = new ImageIcon(getClass().getResource("menu_bg.jpeg"));
                 g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -189,12 +186,11 @@ public class BudgetingSystem {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon bg = new ImageIcon("admin_bg2.jpeg"); // Background for Admin menu after logging in
+                ImageIcon bg = new ImageIcon(getClass().getResource("admin_bg2.jpeg"));
                 g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
         adminMenu.setLayout(new GridBagLayout());
-        adminMenu.setBackground(new Color(220, 220, 250)); // Light purple background
 
         JButton viewUserDataButton = createStyledButton("View User Data");
         JButton editUserDataButton = createStyledButton("Edit User Data");
@@ -298,12 +294,10 @@ public class BudgetingSystem {
 
     private void editUserFile() {
         String username = JOptionPane.showInputDialog(frame, "Enter the username to edit data");
-        String tempFileName = "temp.txt";
         File originalFile = new File(username + ".txt");
-        File tempFile = new File(tempFileName);
-        boolean fileExists = originalFile.exists();
+        File tempFile = new File("temp.txt");
 
-        if (!fileExists) {
+        if (!originalFile.exists()) {
             JOptionPane.showMessageDialog(frame, "User data not found.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -312,14 +306,13 @@ public class BudgetingSystem {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
             String line;
             while ((line = br.readLine()) != null) {
-                bw.write(line); // Copy lines from original
+                bw.write(line);
                 bw.newLine();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Logic for editing user data
         if (originalFile.delete() && tempFile.renameTo(originalFile)) {
             JOptionPane.showMessageDialog(frame, "User data updated successfully.");
         } else {
@@ -358,11 +351,11 @@ public class BudgetingSystem {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.split(" ")[0].equals(username)) {
-                    return false; // Username already exists
+                    return false;
                 }
             }
         } catch (IOException e) {
-            // File not found; can create the file
+            // File not found; will create it
         }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.txt", true))) {
@@ -401,11 +394,10 @@ public class BudgetingSystem {
                 if (parts.length > 2) {
                     float amount = Float.parseFloat(parts[0]);
                     String type = parts[2];
-                    if (type.equals("Income")) {
+                    if (type.equals("Income"))
                         totalIncome += amount;
-                    } else if (type.equals("Expense")) {
+                    else if (type.equals("Expense"))
                         totalExpenses += amount;
-                    }
                 }
             }
         } catch (IOException e) {
@@ -430,22 +422,20 @@ public class BudgetingSystem {
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
-                if (getModel().isArmed()) {
+                if (getModel().isArmed())
                     g.setColor(getBackground().darker());
-                } else {
+                else
                     g.setColor(getBackground());
-                }
-                g.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15); // Create rounded edges
+                g.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
                 super.paintComponent(g);
             }
         };
 
         button.setPreferredSize(new Dimension(200, 40));
         button.setFont(new Font("Arial", Font.BOLD, 16));
-        button.setBackground(new Color(34, 139, 34)); // Forest green
+        button.setBackground(new Color(34, 139, 34));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-
         return button;
     }
 

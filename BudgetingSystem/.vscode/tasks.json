@@ -2,21 +2,30 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build elec1final",
+            "label": "Compile BudgetingSystem",
             "type": "shell",
-            "command": "C:/msys64/ucrt64/bin/gcc.exe",
+            "command": "javac",
             "args": [
-                "-g",
-                "elec1final.c",
-                "-o",
-                "elec1final.exe"
+                "BudgetingSystem.java"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["$gcc"],
-            "detail": "Compile elec1final.c using MSYS2 UCRT64 gcc"
+            "problemMatcher": []
+        },
+        {
+            "label": "Run BudgetingSystem",
+            "type": "shell",
+            "command": "java",
+            "args": [
+                "BudgetingSystem"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
         }
     ]
 }
