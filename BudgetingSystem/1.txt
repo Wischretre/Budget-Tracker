@@ -1,0 +1,5 @@
+20000.0,Salary,Income,25-11-2025 16:36
+200000.0,Drug Deals,Income,25-11-2025 16:36
+500,Beg,Expense,25-11-2025 15:51
+300,Food,Expense,25-11-2025 16:14
+5000.0,Bills,Expense,25-11-2025 16:36
