@@ -2,3 +2,11 @@
 412.0,Food,Expense,25-11-2025 17:46
 2000.0,Bonus,Income,25-11-2025 17:49
 600.0,Bills,Expense,25-11-2025 18:02
+400.0,Food,Expense,27-11-2025 17:32
+600.0,Bills,Expense,27-11-2025 17:32
+500.0,Transportation,Expense,27-11-2025 17:33
+100.0,HELLO,Income,27-11-2025 17:34
+4000.0,Freelance,Income,27-11-2025 17:34
+4000.0,Food,Expense,27-11-2025 17:45
+5000.0,Food,Expense,27-11-2025 17:46
+5000.0,Food,Expense,27-11-2025 17:46
