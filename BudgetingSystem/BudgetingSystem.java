@@ -1,24 +1,63 @@
-import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
@@ -103,144 +142,296 @@ public class BudgetingSystem {
         frame.setVisible(true);
     }
 
-    private void initializeUserRolePanel() {
-        userRolePanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                ImageIcon bg = new ImageIcon(getClass().getResource("acc_bg.jpeg"));
-                g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-        userRolePanel.setLayout(new GridBagLayout());
+private void initializeUserRolePanel() {
+    userRolePanel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ImageIcon bg = new ImageIcon(getClass().getResource("role_bg.jpeg"));
+            g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+    userRolePanel.setLayout(new GridBagLayout());
 
-        JLabel label = new JLabel("Select User Role");
-        label.setFont(new Font("Arial", Font.BOLD, 25));
+    // ---------------------------------------------------------
+    // MESSAGE BOX PANEL (for label)
+    // ---------------------------------------------------------
+    JPanel messageBox = new JPanel(new GridBagLayout());
+    messageBox.setBackground(new Color(0, 0, 0, 150));
+    messageBox.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
-        JButton studentButton = createStyledButton("Student");
-        JButton adminButton = createStyledButton("Admin");
-        JButton exitButton = createStyledButton("Exit Program");
+    JLabel label = new JLabel("<html><center>Welcome!<br>Select User Role</center></html>");
+    label.setFont(new Font("Arial", Font.BOLD, 25));
+    label.setForeground(Color.WHITE);
+    messageBox.add(label);
 
-        studentButton.addActionListener(e -> cardLayout.show(mainPanel, "Student Menu"));
-        adminButton.addActionListener(e -> cardLayout.show(mainPanel, "Admin Menu"));
-        exitButton.addActionListener(e -> System.exit(0));
+    // ---------------------------------------------------------
+    // BUTTONS
+    // ---------------------------------------------------------
+    JButton studentButton = createStyledButton("Student");
+    JButton adminButton = createStyledButton("Admin");
+    JButton exitButton = createStyledButton("Exit Program");
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(30, 30, 30, 30);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        userRolePanel.add(label, gbc);
-        gbc.gridy = 1;
-        userRolePanel.add(studentButton, gbc);
-        gbc.gridy = 2;
-        userRolePanel.add(adminButton, gbc);
-        gbc.gridy = 3;
-        userRolePanel.add(exitButton, gbc);
+    Color buttonColor = Color.decode("#2b643b");
+    JButton[] buttons = {studentButton, adminButton, exitButton};
+    for (JButton btn : buttons) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
     }
 
-    private void initializeStudentPanel() {
-        studentPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                ImageIcon bg = new ImageIcon(getClass().getResource("acc_bg.jpeg"));
-                g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-        studentPanel.setLayout(new GridBagLayout());
+    studentButton.addActionListener(e -> cardLayout.show(mainPanel, "Student Menu"));
+    adminButton.addActionListener(e -> cardLayout.show(mainPanel, "Admin Menu"));
+    exitButton.addActionListener(e -> System.exit(0));
 
-        JLabel label = new JLabel("Welcome to the Budgeting Program");
-        label.setFont(new Font("Arial", Font.BOLD, 25));
+    // ---------------------------------------------------------
+    // GRIDBAG CONSTRAINTS
+    // ---------------------------------------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.insets = new Insets(20, 0, 20, 0); // vertical spacing
+    gbc.anchor = GridBagConstraints.CENTER; // default: center
 
-        JButton signInButton = createStyledButton("Sign In");
-        JButton signUpButton = createStyledButton("Sign Up");
-        JButton backButton = createStyledButton("Exit");
+// ---------------------------------------------------------
+// SLIGHTLY MOVE RIGHT OR LEFT & UP/DOWN
+// ---------------------------------------------------------
+int horizontalOffset = 600; // positive → move right, negative → move left
+int verticalOffset = 90;    // positive → move down, negative → move up
 
-        signInButton.addActionListener(e -> signIn());
-        signUpButton.addActionListener(e -> signUp());
-        backButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
+// Message box
+gbc.gridy = 0;
+gbc.insets = new Insets(20 + verticalOffset, horizontalOffset, 20, 0);
+userRolePanel.add(messageBox, gbc);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(25, 25, 25, 25);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        studentPanel.add(label, gbc);
-        gbc.gridy = 1;
-        studentPanel.add(signInButton, gbc);
-        gbc.gridy = 2;
-        studentPanel.add(signUpButton, gbc);
-        gbc.gridy = 3;
-        studentPanel.add(backButton, gbc);
+// Student button
+gbc.gridy = 1;
+gbc.insets = new Insets(20, horizontalOffset, 20, 0);
+userRolePanel.add(studentButton, gbc);
+
+// Admin button
+gbc.gridy = 2;
+gbc.insets = new Insets(20, horizontalOffset, 20, 0);
+userRolePanel.add(adminButton, gbc);
+
+// Exit button
+gbc.gridy = 3;
+gbc.insets = new Insets(20, horizontalOffset, 20, 0);
+userRolePanel.add(exitButton, gbc);
+
+}
+
+private void initializeStudentPanel() {
+    studentPanel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ImageIcon bg = new ImageIcon(getClass().getResource("role_bg.jpeg"));
+            g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+    studentPanel.setLayout(new GridBagLayout());
+
+    // ---------------------------------------------------------
+    // MESSAGE BOX PANEL (for label)
+    // ---------------------------------------------------------
+    JPanel messageBox = new JPanel(new GridBagLayout());
+    messageBox.setBackground(new Color(0, 0, 0, 150)); // semi-transparent black
+    messageBox.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+
+    JLabel label = new JLabel("<html><center>Welcome to the Budgeting Program</center></html>");
+    label.setFont(new Font("Arial", Font.BOLD, 25));
+    label.setForeground(Color.WHITE);
+
+    messageBox.add(label);
+
+    // ---------------------------------------------------------
+    // BUTTONS
+    // ---------------------------------------------------------
+    JButton signInButton = createStyledButton("Sign In");
+    JButton signUpButton = createStyledButton("Sign Up");
+    JButton backButton = createStyledButton("Exit");
+
+    Color buttonColor = Color.decode("#2b643b"); // same green color as user role panel
+    JButton[] buttons = {signInButton, signUpButton, backButton};
+    for (JButton btn : buttons) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
     }
 
-    private void initializeAdminPanel() {
-        adminPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                ImageIcon bg = new ImageIcon(getClass().getResource("admin_bg.jpeg"));
-                g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-        adminPanel.setLayout(new GridBagLayout());
+    signInButton.addActionListener(e -> signIn());
+    signUpButton.addActionListener(e -> signUp());
+    backButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
 
-        JTextField usernameField = new JTextField(20);
-        JPasswordField passwordField = new JPasswordField(20);
-        JButton loginButton = createStyledButton("Login");
-        JButton backButton = createStyledButton("Back");
+    // ---------------------------------------------------------
+    // GRIDBAG CONSTRAINTS
+    // ---------------------------------------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.anchor = GridBagConstraints.CENTER;
 
-        JLabel titleLabel = new JLabel("Welcome to the Admin System");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
-        JLabel userLabel = new JLabel("Username: ");
-        JLabel passLabel = new JLabel("Password: ");
-        userLabel.setFont(new Font("Arial", Font.PLAIN, 24));
-        passLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+    // Horizontal and vertical positioning
+    int horizontalOffset = 600; // positive → move right, negative → move left
+    int verticalOffset = 90;    // positive → move down, negative → move up
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        adminPanel.add(titleLabel, gbc);
+    // Message box
+    gbc.gridy = 0;
+    gbc.insets = new Insets(25 + verticalOffset, horizontalOffset, 25, 0);
+    studentPanel.add(messageBox, gbc);
 
-        gbc.gridwidth = 1;
-        gbc.gridy = 1;
-        adminPanel.add(userLabel, gbc);
-        gbc.gridx = 1;
-        adminPanel.add(usernameField, gbc);
+    // Buttons
+    gbc.gridy = 1;
+    gbc.insets = new Insets(25, horizontalOffset, 25, 0);
+    studentPanel.add(signInButton, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        adminPanel.add(passLabel, gbc);
-        gbc.gridx = 1;
-        adminPanel.add(passwordField, gbc);
+    gbc.gridy = 2;
+    studentPanel.add(signUpButton, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        adminPanel.add(loginButton, gbc);
-        gbc.gridx = 1;
-        adminPanel.add(backButton, gbc);
+    gbc.gridy = 3;
+    studentPanel.add(backButton, gbc);
+}
 
-        loginButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
+private void initializeAdminPanel() {
+    adminPanel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ImageIcon bg = new ImageIcon(getClass().getResource("admin_bg.jpeg"));
+            g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+    adminPanel.setLayout(new GridBagLayout());
 
-            if (username.equals("admin") && password.equals("runme")) {
-                adminMenu();
-            } else {
-                JOptionPane.showMessageDialog(frame, "Invalid Admin Credentials", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+    // ---------------------------------------------------------
+    // WELCOME MESSAGE BOX
+    // ---------------------------------------------------------
+    JPanel messageBox = new JPanel(new GridBagLayout());
+    messageBox.setBackground(new Color(0, 0, 0, 150)); // semi-transparent black
+    messageBox.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
-        backButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
+    JLabel titleLabel = new JLabel("<html><center>Welcome to the Admin System</center></html>");
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 32));
+    titleLabel.setForeground(Color.WHITE);
+    messageBox.add(titleLabel);
+
+    // ---------------------------------------------------------
+    // USERNAME & PASSWORD BOXES
+    // ---------------------------------------------------------
+    JPanel userBox = new JPanel(new GridBagLayout());
+    userBox.setBackground(new Color(0, 0, 0, 120)); // slightly transparent
+    userBox.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    JLabel userLabel = new JLabel("Username: ");
+    userLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+    userLabel.setForeground(Color.WHITE);
+    JTextField usernameField = new JTextField(20);
+
+    GridBagConstraints gbcUser = new GridBagConstraints();
+    gbcUser.gridx = 0;
+    gbcUser.gridy = 0;
+    gbcUser.anchor = GridBagConstraints.WEST;
+    gbcUser.insets = new Insets(5, 5, 5, 5);
+    userBox.add(userLabel, gbcUser);
+
+    gbcUser.gridx = 1;
+    userBox.add(usernameField, gbcUser);
+
+    JPanel passBox = new JPanel(new GridBagLayout());
+    passBox.setBackground(new Color(0, 0, 0, 120));
+    passBox.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    JLabel passLabel = new JLabel("Password: ");
+    passLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+    passLabel.setForeground(Color.WHITE);
+    JPasswordField passwordField = new JPasswordField(20);
+
+    GridBagConstraints gbcPass = new GridBagConstraints();
+    gbcPass.gridx = 0;
+    gbcPass.gridy = 0;
+    gbcPass.anchor = GridBagConstraints.WEST;
+    gbcPass.insets = new Insets(5, 5, 5, 5);
+    passBox.add(passLabel, gbcPass);
+
+    gbcPass.gridx = 1;
+    passBox.add(passwordField, gbcPass);
+
+    // ---------------------------------------------------------
+    // BUTTONS
+    // ---------------------------------------------------------
+    JButton loginButton = createStyledButton("Login");
+    JButton backButton = createStyledButton("Back");
+
+    Color buttonColor = Color.decode("#2b643b");
+    JButton[] buttons = {loginButton, backButton};
+    for (JButton btn : buttons) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
     }
+
+    // ---------------------------------------------------------
+    // GRIDBAG CONSTRAINTS FOR MAIN PANEL
+    // ---------------------------------------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.CENTER;
+
+    int horizontalOffset = 100; // move right
+    int verticalOffset = 20;    // move down
+
+    // Welcome message
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.gridwidth = 2;
+    gbc.insets = new Insets(20 + verticalOffset, horizontalOffset, 20, 100);
+    adminPanel.add(messageBox, gbc);
+
+    gbc.gridwidth = 2;
+
+    // Username box
+    gbc.gridy = 1;
+    gbc.insets = new Insets(15, horizontalOffset, 15, 100);
+    adminPanel.add(userBox, gbc);
+
+    // Password box
+    gbc.gridy = 2;
+    gbc.insets = new Insets(15, horizontalOffset, 15, 100);
+    adminPanel.add(passBox, gbc);
+
+    // Buttons
+    gbc.gridwidth = 1;
+
+    gbc.gridy = 3;
+    gbc.gridx = 0;
+    gbc.insets = new Insets(20, horizontalOffset, 20, 10);
+    adminPanel.add(loginButton, gbc);
+
+    gbc.gridx = 1;
+    gbc.insets = new Insets(20, 10, 20, horizontalOffset);
+    adminPanel.add(backButton, gbc);
+
+    // ---------------------------------------------------------
+    // ACTIONS
+    // ---------------------------------------------------------
+    loginButton.addActionListener(e -> {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+
+        if (username.equals("admin") && password.equals("runme")) {
+            adminMenu();
+        } else {
+            JOptionPane.showMessageDialog(frame, "Invalid Admin Credentials", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    backButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
+}
 
     private void initializeProgramMenuPanel() {
         programMenuPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon bg = new ImageIcon(getClass().getResource("menu_bg.jpeg"));
+                ImageIcon bg = new ImageIcon(getClass().getResource("acc_bg.jpeg"));
                 g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -277,29 +468,242 @@ public class BudgetingSystem {
         programMenuPanel.add(exitButton, gbc);
     }
 
-    private void signIn() {
-        String username = JOptionPane.showInputDialog(frame, "Enter username [FirstName_LastName]");
-        String password = JOptionPane.showInputDialog(frame, "Enter password");
+private void signIn() {
+    // Panel with GridBagLayout
+    JPanel signInPanel = new JPanel(new GridBagLayout()) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            setOpaque(false); // transparent to show parent background
+        }
+    };
+
+    // ---------------------------
+    // Welcome Message
+    // ---------------------------
+    JLabel welcomeLabel = new JLabel("<html><center>Welcome Back! ✨<br>Sign in to continue</center></html>");
+    welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
+    welcomeLabel.setForeground(Color.CYAN);
+
+    // ---------------------------
+    // Username Label + Icon
+    // ---------------------------
+    ImageIcon userIcon = new ImageIcon(getClass().getResource("user_icon.png")); // 24x24 PNG
+    JLabel userLabel = new JLabel("Username:");
+    userLabel.setIcon(userIcon);
+    userLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    userLabel.setForeground(new Color(168, 255, 96));
+
+    JTextField usernameField = new JTextField(20);
+    usernameField.setBackground(new Color(255, 255, 255, 220));
+    usernameField.setForeground(Color.BLACK);
+    usernameField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+
+    // ---------------------------
+    // Password Label + Icon
+    // ---------------------------
+    ImageIcon lockIcon = new ImageIcon(getClass().getResource("lock_icon.png")); // 24x24 PNG
+    JLabel passLabel = new JLabel("Password:");
+    passLabel.setIcon(lockIcon);
+    passLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    passLabel.setForeground(new Color(168, 255, 96));
+
+    JPasswordField passwordField = new JPasswordField(20);
+    passwordField.setBackground(new Color(255, 255, 255, 220));
+    passwordField.setForeground(Color.BLACK);
+    passwordField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+
+    // ---------------------------
+    // Buttons
+    // ---------------------------
+    JButton submitButton = createStyledButton("Sign In ✅");
+    JButton cancelButton = createStyledButton("Cancel ❌");
+    Color buttonColor = Color.decode("#2b643b");
+    JButton[] buttons = {submitButton, cancelButton};
+    for (JButton btn : buttons) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
+    }
+
+    // ---------------------------
+    // Layout
+    // ---------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.CENTER;
+
+    int horizontalOffset = 50;
+    int verticalOffset = 20;
+
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.gridwidth = 2;
+    gbc.insets = new Insets(10 + verticalOffset, horizontalOffset, 20, 10);
+    signInPanel.add(welcomeLabel, gbc);
+
+    gbc.gridwidth = 1;
+    gbc.gridy = 1;
+    gbc.gridx = 0;
+    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    signInPanel.add(userLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    signInPanel.add(usernameField, gbc);
+
+    gbc.gridy = 2;
+    gbc.gridx = 0;
+    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    signInPanel.add(passLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    signInPanel.add(passwordField, gbc);
+
+    gbc.gridy = 3;
+    gbc.gridx = 0;
+    gbc.insets = new Insets(15, horizontalOffset, 15, 5);
+    signInPanel.add(submitButton, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(15, 5, 15, horizontalOffset);
+    signInPanel.add(cancelButton, gbc);
+
+    // ---------------------------
+    // Dialog
+    // ---------------------------
+    JDialog dialog = new JDialog(frame, "Sign In", true);
+    dialog.getContentPane().add(signInPanel);
+    dialog.pack();
+    dialog.setLocationRelativeTo(frame);
+
+    // ---------------------------
+    // Button Actions
+    // ---------------------------
+    submitButton.addActionListener(e -> {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
 
         if (authenticateUser(username, password)) {
             currentUser = username;
+            dialog.dispose();
             cardLayout.show(mainPanel, "Program Menu");
         } else {
-            JOptionPane.showMessageDialog(frame, "Incorrect username or password", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void signUp() {
-        String username = JOptionPane.showInputDialog(frame, "Enter a new username [FirstName_LastName]");
-        String password = JOptionPane.showInputDialog(frame, "Enter a new password");
-
-        if (registerUser(username, password)) {
-            JOptionPane.showMessageDialog(frame, "Sign-up successful! You can now sign in.");
-        } else {
-            JOptionPane.showMessageDialog(frame, "Username already exists. Please try again.", "Error",
+            JOptionPane.showMessageDialog(dialog, "Incorrect username or password ❌", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+    });
+
+    cancelButton.addActionListener(e -> dialog.dispose());
+
+    dialog.setVisible(true);
+}
+
+
+private void signUp() {
+    JPanel signUpPanel = new JPanel(new GridBagLayout()) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            setOpaque(false);
+        }
+    };
+
+    // Welcome message
+    JLabel welcomeLabel = new JLabel("<html><center>Join Us! ✨<br>Create your account below</center></html>");
+    welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
+    welcomeLabel.setForeground(Color.CYAN);
+
+    // Username
+    JLabel userLabel = new JLabel("<html><span style='color:#a8ff60; font-weight:bold;'>👤 New Username:</span></html>");
+    userLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+    JTextField usernameField = new JTextField(20);
+    usernameField.setBackground(new Color(255, 255, 255, 220));
+    usernameField.setForeground(Color.BLACK);
+    usernameField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+
+    // Password
+    JLabel passLabel = new JLabel("<html><span style='color:#a8ff60; font-weight:bold;'>🔒 New Password:</span></html>");
+    passLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+    JPasswordField passwordField = new JPasswordField(20);
+    passwordField.setBackground(new Color(255, 255, 255, 220));
+    passwordField.setForeground(Color.BLACK);
+    passwordField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+
+    // Buttons
+    JButton submitButton = createStyledButton("Sign Up ✅");
+    JButton cancelButton = createStyledButton("Cancel ❌");
+    Color buttonColor = Color.decode("#2b643b");
+    JButton[] buttons = {submitButton, cancelButton};
+    for (JButton btn : buttons) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
     }
+
+    // Layout
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.anchor = GridBagConstraints.CENTER;
+
+    int horizontalOffset = 50;
+    int verticalOffset = 20;
+
+    // Add components
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.gridwidth = 2;
+    gbc.insets = new Insets(10 + verticalOffset, horizontalOffset, 20, 10);
+    signUpPanel.add(welcomeLabel, gbc);
+
+    gbc.gridwidth = 1;
+    gbc.gridy = 1;
+    gbc.gridx = 0;
+    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    signUpPanel.add(userLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    signUpPanel.add(usernameField, gbc);
+
+    gbc.gridy = 2;
+    gbc.gridx = 0;
+    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    signUpPanel.add(passLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    signUpPanel.add(passwordField, gbc);
+
+    gbc.gridy = 3;
+    gbc.gridx = 0;
+    gbc.insets = new Insets(15, horizontalOffset, 15, 5);
+    signUpPanel.add(submitButton, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(15, 5, 15, horizontalOffset);
+    signUpPanel.add(cancelButton, gbc);
+
+    // Dialog
+    JDialog dialog = new JDialog(frame, "Sign Up", true);
+    dialog.getContentPane().add(signUpPanel);
+    dialog.pack();
+    dialog.setLocationRelativeTo(frame);
+
+    // Actions
+    submitButton.addActionListener(e -> {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+
+        if (registerUser(username, password)) {
+            JOptionPane.showMessageDialog(dialog, "Sign-up successful! 🎉 You can now sign in.");
+            dialog.dispose();
+        } else {
+            JOptionPane.showMessageDialog(dialog, "Username already exists ❌. Please try again.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    cancelButton.addActionListener(e -> dialog.dispose());
+
+    dialog.setVisible(true);
+}
+
+
 
     private void addIncome() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -412,42 +816,67 @@ public class BudgetingSystem {
         }
     }
 
-    private void adminMenu() {
-        JPanel adminMenu = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                ImageIcon bg = new ImageIcon(getClass().getResource("admin_bg2.jpeg"));
-                g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-        adminMenu.setLayout(new GridBagLayout());
+private void adminMenu() {
+    JPanel adminMenu = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ImageIcon bg = new ImageIcon(getClass().getResource("admin_bg.jpeg"));
+            g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+    adminMenu.setLayout(new GridBagLayout());
 
-        JButton viewUserDataButton = createStyledButton("View User Data");
-        JButton editUserDataButton = createStyledButton("Edit User Data");
-        JButton removeUserDataButton = createStyledButton("Remove User Data");
-        JButton adminExitButton = createStyledButton("Exit");
+    // ---------------------------------------------------------
+    // BUTTONS
+    // ---------------------------------------------------------
+    JButton viewUserDataButton = createStyledButton("View User Data");
+    JButton editUserDataButton = createStyledButton("Edit User Data");
+    JButton removeUserDataButton = createStyledButton("Remove User Data");
+    JButton adminExitButton = createStyledButton("Exit");
 
-        viewUserDataButton.addActionListener(e -> viewAllUsers());
-        editUserDataButton.addActionListener(e -> editUserFile());
-        removeUserDataButton.addActionListener(e -> removeUserFile());
-        adminExitButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        adminMenu.add(viewUserDataButton, gbc);
-        gbc.gridy = 1;
-        adminMenu.add(editUserDataButton, gbc);
-        gbc.gridy = 2;
-        adminMenu.add(removeUserDataButton, gbc);
-        gbc.gridy = 3;
-        adminMenu.add(adminExitButton, gbc);
-
-        mainPanel.add(adminMenu, "Admin Menu Actions");
-        cardLayout.show(mainPanel, "Admin Menu Actions");
+    // Set button colors
+    Color buttonColor = Color.decode("#2b643b");
+    JButton[] buttons = {viewUserDataButton, editUserDataButton, removeUserDataButton, adminExitButton};
+    for (JButton btn : buttons) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
     }
+
+    // Button actions
+    viewUserDataButton.addActionListener(e -> viewAllUsers());
+    editUserDataButton.addActionListener(e -> editUserFile());
+    removeUserDataButton.addActionListener(e -> removeUserFile());
+    adminExitButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
+
+    // ---------------------------------------------------------
+    // GRIDBAG CONSTRAINTS
+    // ---------------------------------------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.anchor = GridBagConstraints.CENTER;
+
+    int horizontalOffset = 100; // move right
+    int verticalOffset = 20;    // move down
+    gbc.insets = new Insets(15 + verticalOffset, horizontalOffset, 15, 0);
+
+    // Add buttons to panel
+    gbc.gridy = 0;
+    adminMenu.add(viewUserDataButton, gbc);
+    gbc.gridy = 1;
+    adminMenu.add(editUserDataButton, gbc);
+    gbc.gridy = 2;
+    adminMenu.add(removeUserDataButton, gbc);
+    gbc.gridy = 3;
+    adminMenu.add(adminExitButton, gbc);
+
+    // ---------------------------------------------------------
+    // Add to main panel and show
+    // ---------------------------------------------------------
+    mainPanel.add(adminMenu, "Admin Menu Actions");
+    cardLayout.show(mainPanel, "Admin Menu Actions");
+}
 
     private void viewAllUsers() {
         File usersFile = new File("users.txt");

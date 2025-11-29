@@ -1,0 +1,4 @@
+58000.0,Salary,Income,27-11-2025 18:16
+11000.0,Food,Expense,27-11-2025 18:17
+500.0,Transportation,Expense,27-11-2025 18:17
+10000.0,Bills,Expense,27-11-2025 18:17
