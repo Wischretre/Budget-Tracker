@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -53,7 +52,6 @@ import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PiePlot;
@@ -469,118 +467,86 @@ private void initializeAdminPanel() {
     }
 
 private void signIn() {
-    // Panel with GridBagLayout
     JPanel signInPanel = new JPanel(new GridBagLayout()) {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            setOpaque(false); // transparent to show parent background
+            setOpaque(false); // allow parent background to show
         }
     };
 
-    // ---------------------------
-    // Welcome Message
-    // ---------------------------
-    JLabel welcomeLabel = new JLabel("<html><center>Welcome Back! ✨<br>Sign in to continue</center></html>");
+    // Welcome message
+    JLabel welcomeLabel = new JLabel("✨ Welcome Back! Sign in to continue ✨");
     welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
     welcomeLabel.setForeground(Color.CYAN);
 
-    // ---------------------------
-    // Username Label + Icon
-    // ---------------------------
-    ImageIcon userIcon = new ImageIcon(getClass().getResource("user_icon.png")); // 24x24 PNG
-    JLabel userLabel = new JLabel("Username:");
-    userLabel.setIcon(userIcon);
+    // Username
+    JLabel userLabel = new JLabel("👤 Username:");
     userLabel.setFont(new Font("Arial", Font.BOLD, 24));
     userLabel.setForeground(new Color(168, 255, 96));
-
     JTextField usernameField = new JTextField(20);
     usernameField.setBackground(new Color(255, 255, 255, 220));
     usernameField.setForeground(Color.BLACK);
     usernameField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
 
-    // ---------------------------
-    // Password Label + Icon
-    // ---------------------------
-    ImageIcon lockIcon = new ImageIcon(getClass().getResource("lock_icon.png")); // 24x24 PNG
-    JLabel passLabel = new JLabel("Password:");
-    passLabel.setIcon(lockIcon);
+    // Password
+    JLabel passLabel = new JLabel("🔒 Password:");
     passLabel.setFont(new Font("Arial", Font.BOLD, 24));
     passLabel.setForeground(new Color(168, 255, 96));
-
     JPasswordField passwordField = new JPasswordField(20);
     passwordField.setBackground(new Color(255, 255, 255, 220));
     passwordField.setForeground(Color.BLACK);
     passwordField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
 
-    // ---------------------------
     // Buttons
-    // ---------------------------
     JButton submitButton = createStyledButton("Sign In ✅");
     JButton cancelButton = createStyledButton("Cancel ❌");
     Color buttonColor = Color.decode("#2b643b");
-    JButton[] buttons = {submitButton, cancelButton};
-    for (JButton btn : buttons) {
+    for (JButton btn : new JButton[]{submitButton, cancelButton}) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
         btn.setOpaque(true);
     }
 
-    // ---------------------------
     // Layout
-    // ---------------------------
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.anchor = GridBagConstraints.CENTER;
+    int hOffset = 50, vOffset = 20;
 
-    int horizontalOffset = 50;
-    int verticalOffset = 20;
-
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.gridwidth = 2;
-    gbc.insets = new Insets(10 + verticalOffset, horizontalOffset, 20, 10);
+    gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+    gbc.insets = new Insets(10 + vOffset, hOffset, 20, 10);
     signInPanel.add(welcomeLabel, gbc);
 
-    gbc.gridwidth = 1;
-    gbc.gridy = 1;
-    gbc.gridx = 0;
-    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    gbc.gridwidth = 1; gbc.gridy = 1; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
     signInPanel.add(userLabel, gbc);
     gbc.gridx = 1;
-    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    gbc.insets = new Insets(5, 5, 5, hOffset);
     signInPanel.add(usernameField, gbc);
 
-    gbc.gridy = 2;
-    gbc.gridx = 0;
-    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    gbc.gridy = 2; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
     signInPanel.add(passLabel, gbc);
     gbc.gridx = 1;
-    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    gbc.insets = new Insets(5, 5, 5, hOffset);
     signInPanel.add(passwordField, gbc);
 
-    gbc.gridy = 3;
-    gbc.gridx = 0;
-    gbc.insets = new Insets(15, horizontalOffset, 15, 5);
+    gbc.gridy = 3; gbc.gridx = 0;
+    gbc.insets = new Insets(15, hOffset, 15, 5);
     signInPanel.add(submitButton, gbc);
     gbc.gridx = 1;
-    gbc.insets = new Insets(15, 5, 15, horizontalOffset);
+    gbc.insets = new Insets(15, 5, 15, hOffset);
     signInPanel.add(cancelButton, gbc);
 
-    // ---------------------------
     // Dialog
-    // ---------------------------
     JDialog dialog = new JDialog(frame, "Sign In", true);
     dialog.getContentPane().add(signInPanel);
     dialog.pack();
     dialog.setLocationRelativeTo(frame);
 
-    // ---------------------------
-    // Button Actions
-    // ---------------------------
     submitButton.addActionListener(e -> {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
-
         if (authenticateUser(username, password)) {
             currentUser = username;
             dialog.dispose();
@@ -592,10 +558,8 @@ private void signIn() {
     });
 
     cancelButton.addActionListener(e -> dialog.dispose());
-
     dialog.setVisible(true);
 }
-
 
 private void signUp() {
     JPanel signUpPanel = new JPanel(new GridBagLayout()) {
@@ -607,21 +571,23 @@ private void signUp() {
     };
 
     // Welcome message
-    JLabel welcomeLabel = new JLabel("<html><center>Join Us! ✨<br>Create your account below</center></html>");
+    JLabel welcomeLabel = new JLabel("✨ Join Us! Create your account below ✨");
     welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
     welcomeLabel.setForeground(Color.CYAN);
 
     // Username
-    JLabel userLabel = new JLabel("<html><span style='color:#a8ff60; font-weight:bold;'>👤 New Username:</span></html>");
-    userLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+    JLabel userLabel = new JLabel("👤 New Username:");
+    userLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    userLabel.setForeground(new Color(168, 255, 96));
     JTextField usernameField = new JTextField(20);
     usernameField.setBackground(new Color(255, 255, 255, 220));
     usernameField.setForeground(Color.BLACK);
     usernameField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
 
     // Password
-    JLabel passLabel = new JLabel("<html><span style='color:#a8ff60; font-weight:bold;'>🔒 New Password:</span></html>");
-    passLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+    JLabel passLabel = new JLabel("🔒 New Password:");
+    passLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    passLabel.setForeground(new Color(168, 255, 96));
     JPasswordField passwordField = new JPasswordField(20);
     passwordField.setBackground(new Color(255, 255, 255, 220));
     passwordField.setForeground(Color.BLACK);
@@ -631,8 +597,7 @@ private void signUp() {
     JButton submitButton = createStyledButton("Sign Up ✅");
     JButton cancelButton = createStyledButton("Cancel ❌");
     Color buttonColor = Color.decode("#2b643b");
-    JButton[] buttons = {submitButton, cancelButton};
-    for (JButton btn : buttons) {
+    for (JButton btn : new JButton[]{submitButton, cancelButton}) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
         btn.setOpaque(true);
@@ -640,42 +605,32 @@ private void signUp() {
 
     // Layout
     GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 10, 10, 10);
     gbc.anchor = GridBagConstraints.CENTER;
+    int hOffset = 50, vOffset = 20;
 
-    int horizontalOffset = 50;
-    int verticalOffset = 20;
-
-    // Add components
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.gridwidth = 2;
-    gbc.insets = new Insets(10 + verticalOffset, horizontalOffset, 20, 10);
+    gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+    gbc.insets = new Insets(10 + vOffset, hOffset, 20, 10);
     signUpPanel.add(welcomeLabel, gbc);
 
-    gbc.gridwidth = 1;
-    gbc.gridy = 1;
-    gbc.gridx = 0;
-    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    gbc.gridwidth = 1; gbc.gridy = 1; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
     signUpPanel.add(userLabel, gbc);
     gbc.gridx = 1;
-    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    gbc.insets = new Insets(5, 5, 5, hOffset);
     signUpPanel.add(usernameField, gbc);
 
-    gbc.gridy = 2;
-    gbc.gridx = 0;
-    gbc.insets = new Insets(5, horizontalOffset, 5, 5);
+    gbc.gridy = 2; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
     signUpPanel.add(passLabel, gbc);
     gbc.gridx = 1;
-    gbc.insets = new Insets(5, 5, 5, horizontalOffset);
+    gbc.insets = new Insets(5, 5, 5, hOffset);
     signUpPanel.add(passwordField, gbc);
 
-    gbc.gridy = 3;
-    gbc.gridx = 0;
-    gbc.insets = new Insets(15, horizontalOffset, 15, 5);
+    gbc.gridy = 3; gbc.gridx = 0;
+    gbc.insets = new Insets(15, hOffset, 15, 5);
     signUpPanel.add(submitButton, gbc);
     gbc.gridx = 1;
-    gbc.insets = new Insets(15, 5, 15, horizontalOffset);
+    gbc.insets = new Insets(15, 5, 15, hOffset);
     signUpPanel.add(cancelButton, gbc);
 
     // Dialog
@@ -684,11 +639,9 @@ private void signUp() {
     dialog.pack();
     dialog.setLocationRelativeTo(frame);
 
-    // Actions
     submitButton.addActionListener(e -> {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
-
         if (registerUser(username, password)) {
             JOptionPane.showMessageDialog(dialog, "Sign-up successful! 🎉 You can now sign in.");
             dialog.dispose();
@@ -699,10 +652,8 @@ private void signUp() {
     });
 
     cancelButton.addActionListener(e -> dialog.dispose());
-
     dialog.setVisible(true);
 }
-
 
 
     private void addIncome() {
