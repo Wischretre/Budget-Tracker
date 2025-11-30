@@ -2311,7 +2311,7 @@ fb.put("ASCENDED FINANCIAL DEITY", new String[]{
     // ADD PANELS WITH CUSTOM BACKGROUNDS
     container.add(createSuggestionPanel("Spending Alert",
             spendingPhrase + "\n\nTop Expenses:\n" + top3,
-            Color.decode("#058c32ff"), // ← CUSTOM COLOR
+            Color.decode("#347a4b"), // ← CUSTOM COLOR
             titleFont, textFont, textColor));
 
     container.add(createSuggestionPanel("Saving Insight",
@@ -2326,7 +2326,7 @@ fb.put("ASCENDED FINANCIAL DEITY", new String[]{
 
     container.add(createSuggestionPanel("Feedback",
             feedback,
-            Color.decode("#058c32ff"), // ← CUSTOM COLOR
+            Color.decode("#347a4b"), // ← CUSTOM COLOR
             titleFont, textFont, textColor));
 
     sugFrame.add(container, BorderLayout.CENTER);
