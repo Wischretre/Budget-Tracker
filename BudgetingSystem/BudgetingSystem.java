@@ -36,7 +36,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -52,14 +51,22 @@ import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYTitleAnnotation;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.RenderingHints;
+
 
 public class BudgetingSystem {
     private JFrame frame;
@@ -1809,18 +1816,18 @@ private void viewSummary() {
     summaryFrame.setLayout(new BorderLayout());
 
     // -------------------------------
-    // Table Models (Editable)
+    // Table Models (editable)
     // -------------------------------
     DefaultTableModel incomeModel = new DefaultTableModel(new String[]{"Amount", "Category", "Date"}, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
-            return column == 0 || column == 1; // allow editing Amount and Category
+            return column == 0 || column == 1; // Amount & Category editable
         }
     };
     DefaultTableModel expenseModel = new DefaultTableModel(new String[]{"Amount", "Category", "Date"}, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
-            return column == 0 || column == 1; // allow editing Amount and Category
+            return column == 0 || column == 1;
         }
     };
 
@@ -1830,6 +1837,9 @@ private void viewSummary() {
     HashMap<String, Float> incomeMap = new HashMap<>();
     HashMap<String, Float> expenseMap = new HashMap<>();
 
+    // -------------------------------
+    // Read user data
+    // -------------------------------
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
         String line;
         while ((line = br.readLine()) != null) {
@@ -1864,12 +1874,23 @@ private void viewSummary() {
     }
 
     // -------------------------------
+    // Add total rows
+    // -------------------------------
+    incomeModel.addRow(new Object[]{"", "TOTAL:", totalIncome});
+    expenseModel.addRow(new Object[]{"", "TOTAL:", totalExpense});
+
+    // -------------------------------
     // Tables
     // -------------------------------
     JTable incomeTable = new JTable(incomeModel);
     JTable expenseTable = new JTable(expenseModel);
-    incomeTable.setFillsViewportHeight(true);
-    expenseTable.setFillsViewportHeight(true);
+
+    // Adjust table font & row height
+    Font tableFont = new Font("Arial", Font.PLAIN, 16);
+    incomeTable.setFont(tableFont);
+    expenseTable.setFont(tableFont);
+    incomeTable.setRowHeight(25);
+    expenseTable.setRowHeight(25);
 
     // Right-align Amount column
     DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -1877,147 +1898,246 @@ private void viewSummary() {
     incomeTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
     expenseTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
 
-    // Total row bold
-    incomeModel.addRow(new Object[]{"", "TOTAL:", totalIncome});
-    expenseModel.addRow(new Object[]{"", "TOTAL:", totalExpense});
-
+    // Bold total row
     DefaultTableCellRenderer boldRenderer = new DefaultTableCellRenderer() {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (row == table.getRowCount() - 1) c.setFont(c.getFont().deriveFont(Font.BOLD));
             return c;
         }
     };
-    for (int i = 0; i < incomeTable.getColumnCount(); i++) incomeTable.getColumnModel().getColumn(i).setCellRenderer(boldRenderer);
-    for (int i = 0; i < expenseTable.getColumnCount(); i++) expenseTable.getColumnModel().getColumn(i).setCellRenderer(boldRenderer);
+    for (int i = 0; i < incomeTable.getColumnCount(); i++)
+        incomeTable.getColumnModel().getColumn(i).setCellRenderer(boldRenderer);
+    for (int i = 0; i < expenseTable.getColumnCount(); i++)
+        expenseTable.getColumnModel().getColumn(i).setCellRenderer(boldRenderer);
 
     // -------------------------------
-    // Buttons to delete/edit rows
+    // Buttons with style like initializeUserRolePanel
     // -------------------------------
-    JButton deleteIncomeButton = new JButton("Delete Selected Income");
-    JButton deleteExpenseButton = new JButton("Delete Selected Expense");
+    Color editButtonColor = Color.decode("#2b643b");
+    Color deleteButtonColor = new Color(192, 80, 77); // red
 
+    RoundedButton editIncomeButton = new RoundedButton("Update Income");
+    editIncomeButton.setBackground(editButtonColor);
+    editIncomeButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    editIncomeButton.setCornerRadius(15);
+    editIncomeButton.setPreferredSize(new Dimension(150, 35));
+
+    RoundedButton editExpenseButton = new RoundedButton("Update Expense");
+    editExpenseButton.setBackground(editButtonColor);
+    editExpenseButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    editExpenseButton.setCornerRadius(15);
+    editExpenseButton.setPreferredSize(new Dimension(160, 35));
+
+    RoundedButton deleteIncomeButton = new RoundedButton("Delete Income");
+    deleteIncomeButton.setBackground(deleteButtonColor);
+    deleteIncomeButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    deleteIncomeButton.setCornerRadius(15);
+    deleteIncomeButton.setPreferredSize(new Dimension(150, 35));
+
+    RoundedButton deleteExpenseButton = new RoundedButton("Delete Expense");
+    deleteExpenseButton.setBackground(deleteButtonColor);
+    deleteExpenseButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    deleteExpenseButton.setCornerRadius(15);
+    deleteExpenseButton.setPreferredSize(new Dimension(160, 35));
+
+    // -------------------------------
+    // Button Actions (Delete/Edit)
+    // -------------------------------
     deleteIncomeButton.addActionListener(e -> {
         int row = incomeTable.getSelectedRow();
-        if (row >= 0 && row != incomeTable.getRowCount() - 1) { // don't delete TOTAL
+        if (row >= 0 && row != incomeTable.getRowCount() - 1) {
             incomeModel.removeRow(row);
+            saveTableToFile(incomeModel, "Income");
         }
     });
-
     deleteExpenseButton.addActionListener(e -> {
         int row = expenseTable.getSelectedRow();
-        if (row >= 0 && row != expenseTable.getRowCount() - 1) { // don't delete TOTAL
+        if (row >= 0 && row != expenseTable.getRowCount() - 1) {
             expenseModel.removeRow(row);
+            saveTableToFile(expenseModel, "Expense");
         }
     });
 
-    JPanel tablePanel = new JPanel(new GridLayout(2, 2, 10, 10));
-    tablePanel.setBackground(new Color(0, 0, 0, 0));
-    tablePanel.add(new JScrollPane(incomeTable));
-    tablePanel.add(new JScrollPane(expenseTable));
-    tablePanel.add(deleteIncomeButton);
-    tablePanel.add(deleteExpenseButton);
+    editIncomeButton.addActionListener(e -> editTableRow(incomeTable, incomeModel, "Income"));
+    editExpenseButton.addActionListener(e -> editTableRow(expenseTable, expenseModel, "Expense"));
 
     // -------------------------------
-    // Savings Panel (Pie Chart)
+    // Layout for tables & buttons
     // -------------------------------
-    float savings = totalIncome - totalExpense;
+    JPanel incomeButtonPanel = new JPanel();
+    incomeButtonPanel.add(editIncomeButton);
+    incomeButtonPanel.add(deleteIncomeButton);
+
+    JPanel expenseButtonPanel = new JPanel();
+    expenseButtonPanel.add(editExpenseButton);
+    expenseButtonPanel.add(deleteExpenseButton);
+
+    // ScrollPanes with titled borders
+    JScrollPane incomeScroll = new JScrollPane(incomeTable);
+    incomeScroll.setPreferredSize(new Dimension(700, 500));
+    incomeScroll.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(),
+            "Income Transactions",
+            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.DEFAULT_POSITION,
+            new Font("Arial", Font.BOLD, 25)
+    ));
+
+    JScrollPane expenseScroll = new JScrollPane(expenseTable);
+    expenseScroll.setPreferredSize(new Dimension(700, 500));
+    expenseScroll.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(),
+            "Expense Transactions",
+            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+            javax.swing.border.TitledBorder.DEFAULT_POSITION,
+            new Font("Arial", Font.BOLD, 25)
+    ));
+
+    JPanel incomePanel = new JPanel(new BorderLayout());
+    incomePanel.add(incomeScroll, BorderLayout.CENTER);
+    incomePanel.add(incomeButtonPanel, BorderLayout.SOUTH);
+
+    JPanel expensePanel = new JPanel(new BorderLayout());
+    expensePanel.add(expenseScroll, BorderLayout.CENTER);
+    expensePanel.add(expenseButtonPanel, BorderLayout.SOUTH);
+
+    JPanel tablePanel = new JPanel(new GridLayout(1, 2, 10, 10));
+    tablePanel.add(incomePanel);
+    tablePanel.add(expensePanel);
+
+    // -------------------------------
+    // Charts
+    // -------------------------------
     JPanel savingsPanel = ChartHelper.createSavingsPieChartPanel(totalIncome, totalExpense);
-    savingsPanel.setBorder(BorderFactory.createTitledBorder("Savings Overview"));
-
-    // -------------------------------
-    // Monthly Income vs Expense Bar Chart
-    // -------------------------------
     JPanel monthlyBarPanel = ChartHelper.createMonthlyIncomeExpenseBarChart(incomeMonthly, expenseMonthly);
-    monthlyBarPanel.setBorder(BorderFactory.createTitledBorder("Monthly Income vs Expense"));
 
-    // -------------------------------
-    // Main split pane
-    // -------------------------------
-    JSplitPane topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tablePanel, savingsPanel);
-    topSplit.setDividerLocation(700);
+    // Split charts horizontally
+    JSplitPane chartSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, monthlyBarPanel, savingsPanel);
+    chartSplit.setDividerLocation(600);
 
-    JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplit, monthlyBarPanel);
-    mainSplit.setDividerLocation(350);
+    // Top-bottom split: tables vs charts
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tablePanel, chartSplit);
+    mainSplit.setDividerLocation(300);
 
     summaryFrame.add(mainSplit, BorderLayout.CENTER);
     summaryFrame.setLocationRelativeTo(frame);
     summaryFrame.setVisible(true);
 }
+
+private void editTableRow(JTable table, DefaultTableModel model, String type) {
+    int row = table.getSelectedRow();
+    if (row >= 0 && row != model.getRowCount() - 1) {
+        Object currentAmount = table.getValueAt(row, 0);
+        Object currentCategory = table.getValueAt(row, 1);
+        String newAmount = JOptionPane.showInputDialog(frame, "Edit Amount:", currentAmount);
+        String newCategory = JOptionPane.showInputDialog(frame, "Edit Category:", currentCategory);
+        try {
+            float amount = Float.parseFloat(newAmount);
+            table.setValueAt(amount, row, 0);
+            table.setValueAt(newCategory, row, 1);
+            saveTableToFile(model, type); // Update TXT file
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(frame, "Invalid amount entered.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
+private void saveTableToFile(DefaultTableModel model, String type) {
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(currentUser + ".txt"))) {
+        for (int i = 0; i < model.getRowCount() - 1; i++) { // skip total row
+            Object amount = model.getValueAt(i, 0);
+            Object category = model.getValueAt(i, 1);
+            Object date = model.getValueAt(i, 2);
+            bw.write(amount + "," + category + "," + type + "," + date);
+            bw.newLine();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
 class ChartHelper {
 
-    // -------------------------------
-    // Income vs Expense Pie Chart
-    // -------------------------------
-    @SuppressWarnings("unchecked")
-    static JPanel createIncomeExpensePieChartPanel(HashMap<String, Float> incomeMap,
-                                                   HashMap<String, Float> expenseMap) {
-        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-
-        for (Map.Entry<String, Float> entry : incomeMap.entrySet()) {
-            dataset.setValue("Income - " + entry.getKey(), entry.getValue());
-        }
-        for (Map.Entry<String, Float> entry : expenseMap.entrySet()) {
-            dataset.setValue("Expense - " + entry.getKey(), entry.getValue());
-        }
-
-        JFreeChart chart = ChartFactory.createPieChart(
-                "Income vs Expenses",
-                dataset,
-                true,
-                true,
-                false
-        );
-
-        PiePlot<String> plot = (PiePlot<String>) chart.getPlot();
-        plot.setSectionPaint("Income", new Color(79, 129, 189));
-        plot.setSectionPaint("Expense", new Color(192, 80, 77));
-
-        return new ChartPanel(chart);
-    }
-
-    // -------------------------------
-    // Savings Pie Chart
-    // -------------------------------
+    // ------------------------------------------------------------
+    // 1. Savings Pie Chart (Donut Style)
+    // ------------------------------------------------------------
     static JPanel createSavingsPieChartPanel(float totalIncome, float totalExpense) {
-        float savings = totalIncome - totalExpense;
-        if (savings < 0) savings = 0;
 
+        float savings = Math.max(totalIncome - totalExpense, 0);
+
+        // Pie dataset (Savings only)
         DefaultPieDataset dataset = new DefaultPieDataset();
         dataset.setValue("Savings", savings);
-        dataset.setValue("Expenses", totalExpense);
 
+        // Create the chart
         JFreeChart chart = ChartFactory.createPieChart(
-                "Savings Overview",
+                "",
                 dataset,
-                true,
-                true,
+                false,
+                false,
                 false
         );
 
         PiePlot plot = (PiePlot) chart.getPlot();
-        plot.setSectionPaint("Savings", new Color(79, 129, 189));
-        plot.setSectionPaint("Expenses", new Color(192, 80, 77));
+        plot.setSectionPaint("Savings", Color.decode("#2b643b")); // money green
+        plot.setLabelGenerator(null);
+        plot.setCircular(true);
+        plot.setInteriorGap(0.40);
 
-        return new ChartPanel(chart);
+        chart.setBackgroundPaint(Color.WHITE);
+        plot.setBackgroundPaint(Color.WHITE);
+
+        // Add Peso text at the center
+        ChartPanel panel = new ChartPanel(chart) {
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                String text = String.format("Savings - ₱%.2f", savings);
+                g2.setFont(new Font("Arial", Font.BOLD, 22));
+                g2.setColor(Color.decode("#2b643b"));
+
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth(text);
+                int textHeight = fm.getAscent();
+
+                int x = (getWidth() - textWidth) / 2;
+                int y = (getHeight() + textHeight) / 2 - 5;
+
+                g2.drawString(text, x, y);
+            }
+        };
+
+        return panel;
     }
 
-    // -------------------------------
-    // Monthly Income vs Expense Bar Chart
-    // -------------------------------
-    static JPanel createMonthlyIncomeExpenseBarChart(TreeMap<String, Float> incomeMonthly,TreeMap<String, Float> expenseMonthly) {
+
+    // ------------------------------------------------------------
+    // 2. Monthly Income vs Expense Bar Chart
+    // ------------------------------------------------------------
+    static JPanel createMonthlyIncomeExpenseBarChart(
+            TreeMap<String, Float> incomeMonthly,
+            TreeMap<String, Float> expenseMonthly
+    ) {
+
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        for (Map.Entry<String, Float> entry : incomeMonthly.entrySet()) {
-            dataset.addValue(entry.getValue(), "Income", entry.getKey());
-        }
-        for (Map.Entry<String, Float> entry : expenseMonthly.entrySet()) {
-            dataset.addValue(entry.getValue(), "Expense", entry.getKey());
-        }
+        // Load income data
+        incomeMonthly.forEach((month, value) ->
+                dataset.addValue(value, "Income", month)
+        );
 
+        // Load expense data
+        expenseMonthly.forEach((month, value) ->
+                dataset.addValue(value, "Expense", month)
+        );
+
+        // Create bar chart
         JFreeChart chart = ChartFactory.createBarChart(
                 "Monthly Income vs Expense",
                 "Month",
@@ -2032,7 +2152,6 @@ class ChartHelper {
         return new ChartPanel(chart);
     }
 }
-
 
 private void getSuggestions() {
 
