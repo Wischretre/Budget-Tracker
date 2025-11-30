@@ -2183,161 +2183,140 @@ static JPanel createSavingsPieChartPanel(float totalIncome, float totalExpense) 
 
 private void getSuggestions() {
 
-        List<Object[]> incomeRows = getAllIncomeRows();
-        List<Object[]> expenseRows = getAllExpenseRows();
-        List<Object[]> savingsRows = getAllSavingsRows();
+    List<Object[]> incomeRows = getAllIncomeRows();
+    List<Object[]> expenseRows = getAllExpenseRows();
+    List<Object[]> savingsRows = getAllSavingsRows();
 
-        double totalIncome = 0, totalExpense = 0, totalSavings = 0;
+    double totalIncome = 0, totalExpense = 0, totalSavings = 0;
 
-        for (Object[] r : incomeRows)
-            totalIncome += Double.parseDouble(r[0].toString());
-        for (Object[] r : expenseRows)
-            totalExpense += Double.parseDouble(r[0].toString());
-        for (Object[] r : savingsRows)
-            totalSavings += Double.parseDouble(r[0].toString());
+    for (Object[] r : incomeRows)
+        totalIncome += Double.parseDouble(r[0].toString());
+    for (Object[] r : expenseRows)
+        totalExpense += Double.parseDouble(r[0].toString());
+    for (Object[] r : savingsRows)
+        totalSavings += Double.parseDouble(r[0].toString());
 
-        // --- TOP EXPENSES ---
-        expenseRows.sort((a, b) -> Double.compare(
-                Double.parseDouble(b[0].toString()),
-                Double.parseDouble(a[0].toString())));
+    // Sort expenses (for top 3)
+    expenseRows.sort((a, b) -> Double.compare(
+            Double.parseDouble(b[0].toString()),
+            Double.parseDouble(a[0].toString())));
 
-        StringBuilder top3 = new StringBuilder();
-        for (int i = 0; i < Math.min(3, expenseRows.size()); i++) {
-            Object[] e = expenseRows.get(i);
-            top3.append("• ₱").append(e[0]).append(" - ").append(e[1]).append("\n");
+    StringBuilder top3 = new StringBuilder();
+    for (int i = 0; i < Math.min(3, expenseRows.size()); i++) {
+        Object[] e = expenseRows.get(i);
+        top3.append("• ₱").append(e[0]).append(" - ").append(e[1]).append("\n");
+    }
+
+    // Catchphrases
+    String[] catchPhrases = {
+            "Careful. Your spending is rising fast.",
+            "Your wallet is reaching its limit.",
+            "High expenses detected.",
+            "Your finances are under pressure.",
+            "Your spendings are unusually high."
+    };
+    String spendingPhrase = catchPhrases[(int) (Math.random() * catchPhrases.length)];
+
+    // Savings evaluation
+    String savingNudge;
+    if (totalSavings < totalIncome * 0.10)
+        savingNudge = "You saved less than 10%. Increasing your savings is recommended.";
+    else if (totalSavings < totalIncome * 0.30)
+        savingNudge = "Good start. Try to raise your savings even higher.";
+    else if (totalSavings < totalIncome * 0.50)
+        savingNudge = "Great job. Your savings habits are strong.";
+    else
+        savingNudge = "Outstanding savings management.";
+
+    // Financial health score
+    double score = (totalIncome + totalSavings) - totalExpense;
+    String status;
+    if (score < -5000) status = "EXTREMELY BAD";
+    else if (score < -2000) status = "VERY BAD";
+    else if (score < 0) status = "BAD";
+    else if (score < 2000) status = "BARELY SURVIVING";
+    else if (score < 6000) status = "KINDA THRIVING";
+    else if (score < 12000) status = "GOOD";
+    else if (score < 20000) status = "VERY GOOD";
+    else status = "GODLY FINANCIAL MANAGING";
+
+    // Feedback map
+    Map<String, String[]> fb = new HashMap<>();
+    fb.put("EXTREMELY BAD", new String[]{"Your finances are in critical condition.", "Immediate action is required.", "Reduce all non-essential spending."});
+    fb.put("VERY BAD", new String[]{"Your expenses are alarmingly high.", "You need stronger spending control.", "Consider reviewing your weekly budget."});
+    fb.put("BAD", new String[]{"Your balance is weakening.", "You are close to going negative.", "Reducing expenses is recommended."});
+    fb.put("BARELY SURVIVING", new String[]{"You are managing, but just barely.", "Your financial stability is fragile.", "Building savings will help improve this."});
+    fb.put("KINDA THRIVING", new String[]{"You are doing relatively well.", "Your financial habits are improving.", "Maintaining consistency will help further."});
+    fb.put("GOOD", new String[]{"Your financial state is stable.", "Your budgeting discipline is solid.", "You have strong control over your spending."});
+    fb.put("VERY GOOD", new String[]{"Excellent financial management.", "Your spending and saving balance is impressive.", "Strong habits detected."});
+    fb.put("GODLY FINANCIAL MANAGING", new String[]{"Exceptional money management.", "You demonstrate mastery over your finances.", "Top-tier budgeting behavior."});
+
+    String feedback = fb.get(status)[(int)(Math.random() * fb.get(status).length)];
+
+    // ----------------------------------------------------
+    // BUILD PANEL (like viewSummary)
+    // ----------------------------------------------------
+    JFrame sugFrame = new JFrame("Financial Suggestions");
+    sugFrame.setSize(1000, 700);
+    sugFrame.setLayout(new BorderLayout());
+    sugFrame.setLocationRelativeTo(frame);
+
+    Color panelBg = Color.decode("#2b643b");
+    Color textColor = Color.WHITE;
+    Font titleFont = new Font("Segoe UI", Font.BOLD, 20);
+    Font textFont = new Font("Segoe UI", Font.PLAIN, 16);
+
+    JPanel container = new JPanel(new GridLayout(2, 2, 15, 15));
+    container.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    container.setBackground(Color.LIGHT_GRAY);
+
+    container.add(createSuggestionPanel("Spending Alert", spendingPhrase + "\n\nTop Expenses:\n" + top3, panelBg, titleFont, textFont, textColor));
+    container.add(createSuggestionPanel("Saving Insight", savingNudge, panelBg, titleFont, textFont, textColor));
+    container.add(createSuggestionPanel("Financial Health Status", "Your status: " + status, panelBg, titleFont, textFont, textColor));
+    container.add(createSuggestionPanel("Feedback", feedback, panelBg, titleFont, textFont, textColor));
+
+    sugFrame.add(container, BorderLayout.CENTER);
+    sugFrame.setVisible(true);
+}
+
+private JPanel createSuggestionPanel(String title, String message, Color bgColor, Font titleFont, Font textFont, Color textColor) {
+    JPanel panel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(bgColor);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
         }
+    };
 
-        String[] catchPhrases = {
-                "🔥 Careful! Your spending is rising fast!",
-                "😭 Your wallet is begging for mercy!",
-                "⚠️ Heavy expenses detected!",
-                "💸 Your finances are overheating!",
-                "🐗 Your spendings are going wild!"
-        };
-        String spendingPhrase = catchPhrases[(int) (Math.random() * catchPhrases.length)];
+    panel.setOpaque(false);
+    panel.setLayout(new BorderLayout());
+    panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // --- SAVING NUDGE ---
-        String savingNudge;
-        if (totalSavings < totalIncome * 0.10)
-            savingNudge = "💰 You saved less than 10%. Try saving more!";
-        else if (totalSavings < totalIncome * 0.30)
-            savingNudge = "👍 Good start! Try increasing your savings.";
-        else if (totalSavings < totalIncome * 0.50)
-            savingNudge = "💪 Great job! You're saving well!";
-        else
-            savingNudge = "🧠 Amazing! You're a savings master!";
+    JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+    titleLabel.setFont(titleFont);
+    titleLabel.setForeground(textColor);
 
-        // --- FINANCIAL HEALTH ---
-        double score = (totalIncome + totalSavings) - totalExpense;
-        String status;
+    JTextArea messageArea = new JTextArea(message);
+    messageArea.setFont(textFont);
+    messageArea.setForeground(textColor);
+    messageArea.setOpaque(false);
+    messageArea.setEditable(false);
+    messageArea.setHighlighter(null);
+    messageArea.setLineWrap(true);
+    messageArea.setWrapStyleWord(true);
+    messageArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+    messageArea.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        if (score < -5000)
-            status = "EXTREMELY BAD";
-        else if (score < -2000)
-            status = "VERY BAD";
-        else if (score < 0)
-            status = "BAD";
-        else if (score < 2000)
-            status = "BARELY SURVIVING";
-        else if (score < 6000)
-            status = "KINDA THRIVING";
-        else if (score < 12000)
-            status = "GOOD";
-        else if (score < 20000)
-            status = "VERY GOOD";
-        else
-            status = "GODLY FINANCIAL MANAGING";
+    panel.add(titleLabel, BorderLayout.NORTH);
+    panel.add(messageArea, BorderLayout.CENTER);
 
-        // --- FEEDBACK ---
-        Map<String, String[]> fb = new HashMap<>();
+    return panel;
+}
 
-        fb.put("EXTREMELY BAD", new String[] {
-                "⚠️ Your finances are collapsing!",
-                "💀 You're in deep danger. Fix ASAP.",
-                "🔥 Emergency! Cut spending NOW."
-        });
 
-        fb.put("VERY BAD", new String[] {
-                "🚨 Alarming spending level.",
-                "💸 Expenses too high!",
-                "⚡ Tighten your wallet immediately."
-        });
-
-        fb.put("BAD", new String[] {
-                "😬 You're close to negative.",
-                "🪫 Weak balance. Be careful.",
-                "📉 Reduce weekly spending."
-        });
-
-        fb.put("BARELY SURVIVING", new String[] {
-                "🙂 You're surviving — but barely.",
-                "🟡 Try to build more savings.",
-                "⏳ Your balance is fragile."
-        });
-
-        fb.put("KINDA THRIVING", new String[] {
-                "🟢 Nice! You're doing alright.",
-                "✨ Keep this pace up!",
-                "💼 You're improving well."
-        });
-
-        fb.put("GOOD", new String[] {
-                "💚 Stable finances!",
-                "📊 Great balance!",
-                "😎 Strong money management."
-        });
-
-        fb.put("VERY GOOD", new String[] {
-                "💎 Amazing discipline!",
-                "🔥 Managing money like a pro!",
-                "🌟 Excellent financial habits!"
-        });
-
-        fb.put("GODLY FINANCIAL MANAGING", new String[] {
-                "👑 GOD-TIER CONTROL!",
-                "🌌 Legendary budgeting.",
-                "💰 Unstoppable mastery!"
-        });
-
-        String feedback = fb.get(status)[(int) (Math.random() * fb.get(status).length)];
-
-        // ----------------------------------------------------
-        // SHOW ALL 4 PANELS (custom positions)
-        // ----------------------------------------------------
-        showStyledPanel("🔥 Spending Alert", spendingPhrase + "\n\n" + top3, PANEL_SPENDING_X, PANEL_SPENDING_Y);
-        showStyledPanel("💰 Saving Nudge", savingNudge, PANEL_SAVING_X, PANEL_SAVING_Y);
-        showStyledPanel("📊 Financial Health Status", "Your status: " + status, PANEL_HEALTH_X, PANEL_HEALTH_Y);
-        showStyledPanel("💬 Feedback", feedback, PANEL_FEEDBACK_X, PANEL_FEEDBACK_Y);
-
-    }
-
-private void showStyledPanel(String title, String message, int x, int y) {
-
-        JDialog dialog = new JDialog(frame, title, false);
-        dialog.setSize(400, 260);
-        dialog.setLocation(x, y);
-        dialog.setUndecorated(false);
-
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(245, 245, 245));
-        panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(180, 180, 180), 2, true),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)));
-
-        JTextArea area = new JTextArea(message);
-        area.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        area.setEditable(false);
-        area.setLineWrap(true);
-        area.setWrapStyleWord(true);
-        area.setBackground(new Color(245, 245, 245));
-
-        panel.setLayout(new BorderLayout());
-        panel.add(area, BorderLayout.CENTER);
-
-        dialog.add(panel);
-        dialog.setAlwaysOnTop(true);
-        dialog.setVisible(true);
-    }
 
 private List<Object[]> getAllIncomeRows() {
         List<Object[]> incomeList = new ArrayList<>();
@@ -2382,41 +2361,6 @@ private List<Object[]> getAllExpenseRows() {
 private List<Object[]> getAllSavingsRows() {
         // You said you do NOT store savings in file → return empty list
         return new ArrayList<>();
-    }
-
-private JButton createStyledButton(String text) {
-        JButton button = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                if (getModel().isArmed())
-                    g2.setColor(getBackground().darker());
-                else
-                    g2.setColor(getBackground());
-
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-
-                g2.dispose();
-                super.paintComponent(g);
-            }
-
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(300, 60); // fixed size for all buttons
-            }
-        };
-
-        button.setFont(new Font("Arial", Font.BOLD, 25));
-        button.setBackground(new Color(34, 139, 34));
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setOpaque(true);
-
-        return button;
     }
 
 public static void main(String[] args) {
@@ -2534,3 +2478,4 @@ class RoundedLabel extends JLabel {
         g2.dispose();
     }
 }
+
