@@ -54,19 +54,12 @@ import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.annotations.XYTitleAnnotation;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
-import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.RenderingHints;
 
 
 public class BudgetingSystem {
@@ -2195,10 +2188,11 @@ private void getSuggestions() {
 
     double totalSavings = totalIncome - totalExpense;
 
-    // Sort expenses (for top 3)
+    // Sort expenses for top 3
     expenseRows.sort((a, b) -> Double.compare(
             Double.parseDouble(b[0].toString()),
-            Double.parseDouble(a[0].toString())));
+            Double.parseDouble(a[0].toString())
+    ));
 
     StringBuilder top3 = new StringBuilder();
     for (int i = 0; i < Math.min(3, expenseRows.size()); i++) {
@@ -2221,74 +2215,124 @@ private void getSuggestions() {
     if (totalIncome == 0) {
         savingNudge = "No income recorded. Please add income data to get accurate savings insights.";
     } else if (totalSavings < totalIncome * 0.10) {
-        savingNudge = "You saved less than 10% of your income. Consider reviewing your spending habits " +
-                  "and try to set aside a small portion of your income regularly. Even small amounts " +
-                  "can grow over time and build a solid financial cushion.";
+        savingNudge = "You saved less than 10% of your income. Consider reviewing your spending habits and try to set aside more regularly.";
     } else if (totalSavings < totalIncome * 0.30) {
-        savingNudge = "Good start! You've saved between 10% and 30% of your income. " +
-                  "Keep up the momentum and challenge yourself to gradually increase your savings. " +
-                  "Creating a budget or cutting non-essential expenses can help you save even more.";
+        savingNudge = "Good start! You've saved between 10% and 30% of your income. Keep building your momentum.";
     } else if (totalSavings < totalIncome * 0.50) {
-        savingNudge = "Great job! Your savings are strong, representing 30%–50% of your income. " +
-                  "You are building a healthy financial habit. Consider exploring investment options " +
-                  "or setting long-term goals to make your money work for you.";
+        savingNudge = "Great job! Your savings show strong financial habits. Consider investment opportunities.";
     } else {
-        savingNudge = "Outstanding savings management! Saving over 50% of your income shows excellent " +
-                  "discipline and financial awareness. Keep maintaining this habit, and you may achieve " +
-                  "financial independence sooner than expected. Consider sharing your strategies to inspire others.";
+        savingNudge = "Outstanding savings management! Over 50% savings indicates elite discipline.";
     }
 
-
-    // Financial health score
+    // Financial Health Score
     double score = (totalIncome + totalSavings) - totalExpense;
     String status;
-    if (score < -5000) status = "EXTREMELY BAD";
-    else if (score < -2000) status = "VERY BAD";
-    else if (score < 0) status = "BAD";
-    else if (score < 2000) status = "BARELY SURVIVING";
-    else if (score < 6000) status = "KINDA THRIVING";
-    else if (score < 12000) status = "GOOD";
-    else if (score < 20000) status = "VERY GOOD";
-    else status = "GODLY FINANCIAL MANAGING";
 
-    // Feedback map
-    Map<String, String[]> fb = new HashMap<>();
-    fb.put("EXTREMELY BAD", new String[]{"Your finances are in critical condition.", "Immediate action is required.", "Reduce all non-essential spending."});
-    fb.put("VERY BAD", new String[]{"Your expenses are alarmingly high.", "You need stronger spending control.", "Consider reviewing your weekly budget."});
-    fb.put("BAD", new String[]{"Your balance is weakening.", "You are close to going negative.", "Reducing expenses is recommended."});
-    fb.put("BARELY SURVIVING", new String[]{"You are managing, but just barely.", "Your financial stability is fragile.", "Building savings will help improve this."});
-    fb.put("KINDA THRIVING", new String[]{"You are doing relatively well.", "Your financial habits are improving.", "Maintaining consistency will help further."});
-    fb.put("GOOD", new String[]{"Your financial state is stable.", "Your budgeting discipline is solid.", "You have strong control over your spending."});
-    fb.put("VERY GOOD", new String[]{"Excellent financial management.", "Your spending and saving balance is impressive.", "Strong habits detected."});
-    fb.put("GODLY FINANCIAL MANAGING", new String[]{"Exceptional money management.", "You demonstrate mastery over your finances.", "Top-tier budgeting behavior."});
+    if (score < -5000) status = "FINANCIALLY COOKED";
+    else if (score < -2000) status = "YOU'RE COOKED";
+    else if (score < 0) status = "NOT LOOKING GOOD";
+    else if (score < 2000) status = "SURVIVING OUT OF PURE LUCK";
+    else if (score < 6000) status = "KINDA WINNING";
+    else if (score < 12000) status = "WINNING";
+    else if (score < 20000) status = "PEAK MONEY MINDSET";
+    else status = "ASCENDED FINANCIAL DEITY";
+
+// Feedback map (unchanged)
+Map<String, String[]> fb = new HashMap<>();
+
+fb.put("FINANCIALLY COOKED", new String[]{
+        "Your wallet is in the deepest pit imaginable. This is beyond rock bottom—you have discovered the secret basement under rock bottom.",
+        "You are financially speedrunning disaster. Immediate cooldown required. Cut everything that isn't oxygen.",
+        "Your budget is on life support and the doctor is shaking his head. Time to emergency-stop all spending."
+});
+
+fb.put("YOU'RE COOKED", new String[]{
+        "The situation is bad. Like, 'someone check on you' bad. Your expenses are dropping elbows on your savings.",
+        "Money is leaving faster than your will to budget. Please stop the financial bleeding immediately.",
+        "You're in the danger zone. One more impulse purchase and your bank account might file a restraining order."
+});
+
+fb.put("NOT LOOKING GOOD", new String[]{
+        "You're walking on financial thin ice, and it is cracking loudly. One wrong step and you’re underwater.",
+        "You're not negative yet, but your money is sweating. A small adjustment will save you from disaster.",
+        "You're close to the red zone. Tighten up before things get unfunny real quick."
+});
+
+fb.put("SURVIVING OUT OF PURE LUCK", new String[]{
+        "You’re staying afloat purely because the universe is giving you a pity buff. Do not rely on this buff.",
+        "Your finances are held together by hopes, dreams, and maybe tape. Build some actual stability now.",
+        "You’re not struggling, but you’re definitely not safe either. A little discipline goes a long way."
+});
+
+fb.put("KINDA WINNING", new String[]{
+        "You're starting to win at this money thing. Still not main character level, but definitely supporting character with good arc.",
+        "Your financial habits are improving. Keep the momentum so you can fully escape NPC status.",
+        "You're doing pretty well. Just don’t get too confident—expenses are always lurking."
+});
+
+fb.put("WINNING", new String[]{
+        "Strong financial discipline detected. You’re entering protagonist territory.",
+        "Your budgeting is clean. Your spending is controlled. Your wallet? Happy.",
+        "You’re on track to becoming That Person who actually has their finances together."
+});
+
+fb.put("PEAK MONEY MINDSET", new String[]{
+        "You’re in your peak era. Your finances are hitting gym PRs daily.",
+        "Your wallet is thriving. Your bank app loads without fear. Peak behavior.",
+        "You understand money. You command money. Money follows you like a loyal sidekick."
+});
+
+fb.put("ASCENDED FINANCIAL DEITY", new String[]{
+        "You have transcended mortal budgeting. You are the final boss of financial literacy.",
+        "Your money management is so good it should be illegal. You might teach a masterclass accidentally.",
+        "You are untouchable. Your wallet is glowing. Your savings fear nothing. Truly divine financial energy."
+});
+
 
     String feedback = fb.get(status)[(int)(Math.random() * fb.get(status).length)];
 
     // ----------------------------------------------------
-    // BUILD PANEL (like viewSummary)
+    // GUI Panel Setup
     // ----------------------------------------------------
     JFrame sugFrame = new JFrame("Financial Suggestions");
     sugFrame.setSize(1000, 700);
     sugFrame.setLayout(new BorderLayout());
     sugFrame.setLocationRelativeTo(frame);
 
-    Color panelBg = Color.decode("#2b643b");
+    // Fonts & Colors
+    Font titleFont = new Font("Segoe UI", Font.BOLD, 25);   // CHANGE SIZE HERE
+    Font textFont  = new Font("Segoe UI", Font.PLAIN, 20);  // CHANGE SIZE HERE
     Color textColor = Color.WHITE;
-    Font titleFont = new Font("Segoe UI", Font.BOLD, 20);
-    Font textFont = new Font("Segoe UI", Font.PLAIN, 16);
 
     JPanel container = new JPanel(new GridLayout(2, 2, 15, 15));
     container.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
     container.setBackground(Color.LIGHT_GRAY);
 
-    container.add(createSuggestionPanel("Spending Alert", spendingPhrase + "\n\nTop Expenses:\n" + top3, panelBg, titleFont, textFont, textColor));
-    container.add(createSuggestionPanel("Saving Insight", savingNudge, panelBg, titleFont, textFont, textColor));
-    container.add(createSuggestionPanel("Financial Health Status", "Your status: " + status, panelBg, titleFont, textFont, textColor));
-    container.add(createSuggestionPanel("Feedback", feedback, panelBg, titleFont, textFont, textColor));
+    // ADD PANELS WITH CUSTOM BACKGROUNDS
+    container.add(createSuggestionPanel("Spending Alert",
+            spendingPhrase + "\n\nTop Expenses:\n" + top3,
+            Color.decode("#058c32ff"), // ← CUSTOM COLOR
+            titleFont, textFont, textColor));
+
+    container.add(createSuggestionPanel("Saving Insight",
+            savingNudge,
+            Color.decode("#2b643b"), // ← CUSTOM COLOR
+            titleFont, textFont, textColor));
+
+    container.add(createSuggestionPanel("Financial Health Status",
+            "Your status: " + status,
+            Color.decode("#2b643b"), // ← CUSTOM COLOR
+            titleFont, textFont, textColor));
+
+    container.add(createSuggestionPanel("Feedback",
+            feedback,
+            Color.decode("#058c32ff"), // ← CUSTOM COLOR
+            titleFont, textFont, textColor));
 
     sugFrame.add(container, BorderLayout.CENTER);
     sugFrame.setVisible(true);
 }
+
 
 private JPanel createSuggestionPanel(String title, String message, Color bgColor, Font titleFont, Font textFont, Color textColor) {
     JPanel panel = new JPanel() {
