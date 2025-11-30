@@ -1079,7 +1079,7 @@ private void adminMenu() {
 
     RoundedButton viewUserDataButton = new RoundedButton("View User Data");
     RoundedButton editUserDataButton = new RoundedButton("Edit User Data");
-    RoundedButton removeUserDataButton = new RoundedButton("Remove User Data");
+    RoundedButton removeUserDataButton = new RoundedButton("Remove User");
     RoundedButton adminExitButton = new RoundedButton("Exit");
 
     RoundedButton[] buttons = {viewUserDataButton, editUserDataButton, removeUserDataButton, adminExitButton};
@@ -2026,7 +2026,6 @@ private void viewSummary() {
     summaryFrame.setVisible(true);
 }
 
-
 private void editTableRow(JTable table, DefaultTableModel model, String type) {
     int row = table.getSelectedRow();
     if (row >= 0 && row != model.getRowCount() - 1) {
@@ -2044,9 +2043,6 @@ private void editTableRow(JTable table, DefaultTableModel model, String type) {
         }
     }
 }
-
-
-
 
 private void saveAllToFile() {
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(currentUser + ".txt"))) {
@@ -2068,9 +2064,6 @@ private void saveAllToFile() {
         e.printStackTrace();
     }
 }
-
-
-
 
 class ChartHelper {
 
