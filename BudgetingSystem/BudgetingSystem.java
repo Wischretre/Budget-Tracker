@@ -2060,61 +2060,80 @@ private void saveTableToFile(DefaultTableModel model, String type) {
 
 class ChartHelper {
 
-    // ------------------------------------------------------------
-    // 1. Savings Pie Chart (Donut Style)
-    // ------------------------------------------------------------
-    static JPanel createSavingsPieChartPanel(float totalIncome, float totalExpense) {
+// ------------------------------------------------------------
+// 1. Savings Pie Chart (Gauge Style)
+// ------------------------------------------------------------
+static JPanel createSavingsPieChartPanel(float totalIncome, float totalExpense) {
 
-        float savings = Math.max(totalIncome - totalExpense, 0);
+    float savings = Math.max(totalIncome - totalExpense, 0);
+    float percentage = totalIncome > 0 ? (savings / totalIncome) : 0;
 
-        // Pie dataset (Savings only)
-        DefaultPieDataset dataset = new DefaultPieDataset();
-        dataset.setValue("Savings", savings);
+    // Dataset for visual reference (optional)
+    DefaultPieDataset dataset = new DefaultPieDataset();
+    dataset.setValue("Savings", savings);
 
-        // Create the chart
-        JFreeChart chart = ChartFactory.createPieChart(
-                "",
-                dataset,
-                false,
-                false,
-                false
-        );
+    // Create the chart (empty, just for ChartPanel base)
+    JFreeChart chart = ChartFactory.createPieChart(
+            "",
+            dataset,
+            false,
+            false,
+            false
+    );
 
-        PiePlot plot = (PiePlot) chart.getPlot();
-        plot.setSectionPaint("Savings", Color.decode("#2b643b")); // money green
-        plot.setLabelGenerator(null);
-        plot.setCircular(true);
-        plot.setInteriorGap(0.40);
+    PiePlot plot = (PiePlot) chart.getPlot();
+    plot.setSectionPaint("Savings", Color.decode("#2b643b"));
+    plot.setLabelGenerator(null);
+    plot.setCircular(true);
+    plot.setInteriorGap(0.10);
 
-        chart.setBackgroundPaint(Color.WHITE);
-        plot.setBackgroundPaint(Color.WHITE);
+    chart.setBackgroundPaint(Color.WHITE);
+    plot.setBackgroundPaint(Color.WHITE);
 
-        // Add Peso text at the center
-        ChartPanel panel = new ChartPanel(chart) {
-            @Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
+    // Custom ChartPanel with gauge painting
+    ChartPanel panel = new ChartPanel(chart) {
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
 
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                String text = String.format("Savings - ₱%.2f", savings);
-                g2.setFont(new Font("Arial", Font.BOLD, 22));
-                g2.setColor(Color.decode("#2b643b"));
+            int size = Math.min(getWidth(), getHeight()) - 40; // circle size
+            int x = (getWidth() - size) / 2;
+            int y = (getHeight() - size) / 2;
 
-                FontMetrics fm = g2.getFontMetrics();
-                int textWidth = fm.stringWidth(text);
-                int textHeight = fm.getAscent();
+            // Draw background circle (hollow)
+            g2.setColor(new Color(220, 220, 220)); // light gray background
+            g2.setStroke(new java.awt.BasicStroke(30, java.awt.BasicStroke.CAP_ROUND, java.awt.BasicStroke.JOIN_ROUND));
+            g2.drawArc(x, y, size, size, 0, 360);
 
-                int x = (getWidth() - textWidth) / 2;
-                int y = (getHeight() + textHeight) / 2 - 5;
+            // Draw savings arc
+            g2.setColor(Color.decode("#2b643b")); // money green
+            g2.drawArc(x, y, size, size, 90, -(int) (360 * percentage));
 
-                g2.drawString(text, x, y);
-            }
-        };
+            // Draw center text
+            String text = String.format("Savings - ₱%.2f", savings);
+            g2.setFont(new Font("Arial", Font.BOLD, 22));
+            g2.setColor(Color.decode("#2b643b"));
+            FontMetrics fm = g2.getFontMetrics();
+            int textWidth = fm.stringWidth(text);
+            int textHeight = fm.getAscent();
+            int textX = (getWidth() - textWidth) / 2;
+            int textY = (getHeight() + textHeight) / 2 - 5;
+            g2.drawString(text, textX, textY);
 
-        return panel;
-    }
+            // Draw percentage below the text
+            String percentText = String.format("%.0f%%", percentage * 100);
+            g2.setFont(new Font("Arial", Font.BOLD, 16));
+            int percentWidth = g2.getFontMetrics().stringWidth(percentText);
+            g2.drawString(percentText, (getWidth() - percentWidth) / 2, textY + 25);
+        }
+    };
+
+    return panel;
+}
+
 
 
     // ------------------------------------------------------------
