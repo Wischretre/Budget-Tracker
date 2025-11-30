@@ -2185,16 +2185,15 @@ private void getSuggestions() {
 
     List<Object[]> incomeRows = getAllIncomeRows();
     List<Object[]> expenseRows = getAllExpenseRows();
-    List<Object[]> savingsRows = getAllSavingsRows();
 
-    double totalIncome = 0, totalExpense = 0, totalSavings = 0;
+    double totalIncome = 0, totalExpense = 0;
 
     for (Object[] r : incomeRows)
         totalIncome += Double.parseDouble(r[0].toString());
     for (Object[] r : expenseRows)
         totalExpense += Double.parseDouble(r[0].toString());
-    for (Object[] r : savingsRows)
-        totalSavings += Double.parseDouble(r[0].toString());
+
+    double totalSavings = totalIncome - totalExpense;
 
     // Sort expenses (for top 3)
     expenseRows.sort((a, b) -> Double.compare(
@@ -2219,14 +2218,26 @@ private void getSuggestions() {
 
     // Savings evaluation
     String savingNudge;
-    if (totalSavings < totalIncome * 0.10)
-        savingNudge = "You saved less than 10%. Increasing your savings is recommended.";
-    else if (totalSavings < totalIncome * 0.30)
-        savingNudge = "Good start. Try to raise your savings even higher.";
-    else if (totalSavings < totalIncome * 0.50)
-        savingNudge = "Great job. Your savings habits are strong.";
-    else
-        savingNudge = "Outstanding savings management.";
+    if (totalIncome == 0) {
+        savingNudge = "No income recorded. Please add income data to get accurate savings insights.";
+    } else if (totalSavings < totalIncome * 0.10) {
+        savingNudge = "You saved less than 10% of your income. Consider reviewing your spending habits " +
+                  "and try to set aside a small portion of your income regularly. Even small amounts " +
+                  "can grow over time and build a solid financial cushion.";
+    } else if (totalSavings < totalIncome * 0.30) {
+        savingNudge = "Good start! You've saved between 10% and 30% of your income. " +
+                  "Keep up the momentum and challenge yourself to gradually increase your savings. " +
+                  "Creating a budget or cutting non-essential expenses can help you save even more.";
+    } else if (totalSavings < totalIncome * 0.50) {
+        savingNudge = "Great job! Your savings are strong, representing 30%–50% of your income. " +
+                  "You are building a healthy financial habit. Consider exploring investment options " +
+                  "or setting long-term goals to make your money work for you.";
+    } else {
+        savingNudge = "Outstanding savings management! Saving over 50% of your income shows excellent " +
+                  "discipline and financial awareness. Keep maintaining this habit, and you may achieve " +
+                  "financial independence sooner than expected. Consider sharing your strategies to inspire others.";
+    }
+
 
     // Financial health score
     double score = (totalIncome + totalSavings) - totalExpense;

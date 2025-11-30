@@ -1,0 +1,4 @@
+10000.0,Allowance,Income,30-11-2025 22:16
+500.0,Transportation,Expense,30-11-2025 22:16
+5000.0,Food,Expense,01-12-2025 01:33
+3000.0,Rent/Boarding,Expense,01-12-2025 01:34

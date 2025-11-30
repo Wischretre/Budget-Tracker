@@ -1,6 +1,0 @@
-2400.0,Allowance,Income,30-11-2025 20:34
-17000.0,Part-Time Job,Income,30-11-2025 20:34
-90000.0,Business/Side Hustle,Income,30-11-2025 20:34
-5000.0,Food,Expense,30-11-2025 20:34
-2000.0,Transportation,Expense,30-11-2025 20:34
-15000.0,Rent/Boarding,Expense,30-11-2025 20:34
