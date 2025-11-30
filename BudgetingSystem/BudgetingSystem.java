@@ -2316,8 +2316,6 @@ private JPanel createSuggestionPanel(String title, String message, Color bgColor
     return panel;
 }
 
-
-
 private List<Object[]> getAllIncomeRows() {
         List<Object[]> incomeList = new ArrayList<>();
         String filename = currentUser + ".txt";
