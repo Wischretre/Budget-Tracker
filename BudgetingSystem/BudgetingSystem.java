@@ -52,6 +52,8 @@ import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PiePlot;
@@ -77,7 +79,7 @@ public class BudgetingSystem {
     int PANEL_FEEDBACK_X = 550;
     int PANEL_FEEDBACK_Y = 380;
 
-    public BudgetingSystem() {
+public BudgetingSystem() {
 
         // ⭐ GLOBAL FONT OVERRIDE FOR ALL COMPONENTS
         FontUIResource generalFont = new FontUIResource("Arial", Font.PLAIN, 20);
@@ -164,18 +166,20 @@ private void initializeUserRolePanel() {
     messageBox.add(label);
 
     // ---------------------------------------------------------
-    // BUTTONS
+    // ROUNDED BUTTONS
     // ---------------------------------------------------------
-    JButton studentButton = createStyledButton("Student");
-    JButton adminButton = createStyledButton("Admin");
-    JButton exitButton = createStyledButton("Exit Program");
+    RoundedButton studentButton = new RoundedButton("Student");
+    RoundedButton adminButton = new RoundedButton("Admin");
+    RoundedButton exitButton = new RoundedButton("Exit Program");
 
     Color buttonColor = Color.decode("#2b643b");
-    JButton[] buttons = {studentButton, adminButton, exitButton};
-    for (JButton btn : buttons) {
+
+    RoundedButton[] buttons = {studentButton, adminButton, exitButton};
+    for (RoundedButton btn : buttons) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
-        btn.setOpaque(true);
+        btn.setCornerRadius(25);   // smooth corners
+        btn.setOpaque(false);      // required for rounded look
     }
 
     studentButton.addActionListener(e -> cardLayout.show(mainPanel, "Student Menu"));
@@ -187,35 +191,34 @@ private void initializeUserRolePanel() {
     // ---------------------------------------------------------
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
-    gbc.insets = new Insets(20, 0, 20, 0); // vertical spacing
-    gbc.anchor = GridBagConstraints.CENTER; // default: center
+    gbc.insets = new Insets(20, 0, 20, 0);
+    gbc.anchor = GridBagConstraints.CENTER;
 
-// ---------------------------------------------------------
-// SLIGHTLY MOVE RIGHT OR LEFT & UP/DOWN
-// ---------------------------------------------------------
-int horizontalOffset = 600; // positive → move right, negative → move left
-int verticalOffset = 90;    // positive → move down, negative → move up
+    // ---------------------------------------------------------
+    // SLIGHTLY MOVE RIGHT OR LEFT & UP/DOWN
+    // ---------------------------------------------------------
+    int horizontalOffset = 600; // positive → right, negative → left
+    int verticalOffset = 90;    // positive → down, negative → up
 
-// Message box
-gbc.gridy = 0;
-gbc.insets = new Insets(20 + verticalOffset, horizontalOffset, 20, 0);
-userRolePanel.add(messageBox, gbc);
+    // Message box
+    gbc.gridy = 0;
+    gbc.insets = new Insets(20 + verticalOffset, horizontalOffset, 20, 0);
+    userRolePanel.add(messageBox, gbc);
 
-// Student button
-gbc.gridy = 1;
-gbc.insets = new Insets(20, horizontalOffset, 20, 0);
-userRolePanel.add(studentButton, gbc);
+    // Student button
+    gbc.gridy = 1;
+    gbc.insets = new Insets(20, horizontalOffset, 20, 0);
+    userRolePanel.add(studentButton, gbc);
 
-// Admin button
-gbc.gridy = 2;
-gbc.insets = new Insets(20, horizontalOffset, 20, 0);
-userRolePanel.add(adminButton, gbc);
+    // Admin button
+    gbc.gridy = 2;
+    gbc.insets = new Insets(20, horizontalOffset, 20, 0);
+    userRolePanel.add(adminButton, gbc);
 
-// Exit button
-gbc.gridy = 3;
-gbc.insets = new Insets(20, horizontalOffset, 20, 0);
-userRolePanel.add(exitButton, gbc);
-
+    // Exit button
+    gbc.gridy = 3;
+    gbc.insets = new Insets(20, horizontalOffset, 20, 0);
+    userRolePanel.add(exitButton, gbc);
 }
 
 private void initializeStudentPanel() {
@@ -233,7 +236,7 @@ private void initializeStudentPanel() {
     // MESSAGE BOX PANEL (for label)
     // ---------------------------------------------------------
     JPanel messageBox = new JPanel(new GridBagLayout());
-    messageBox.setBackground(new Color(0, 0, 0, 150)); // semi-transparent black
+    messageBox.setBackground(new Color(0, 0, 0, 150)); 
     messageBox.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
     JLabel label = new JLabel("<html><center>Welcome to the Budgeting Program</center></html>");
@@ -243,18 +246,30 @@ private void initializeStudentPanel() {
     messageBox.add(label);
 
     // ---------------------------------------------------------
-    // BUTTONS
+    // ROUNDED BUTTONS
     // ---------------------------------------------------------
-    JButton signInButton = createStyledButton("Sign In");
-    JButton signUpButton = createStyledButton("Sign Up");
-    JButton backButton = createStyledButton("Exit");
+    RoundedButton signInButton = new RoundedButton("Sign In");
+    RoundedButton signUpButton = new RoundedButton("Sign Up");
+    RoundedButton backButton = new RoundedButton("Exit");
 
-    Color buttonColor = Color.decode("#2b643b"); // same green color as user role panel
-    JButton[] buttons = {signInButton, signUpButton, backButton};
-    for (JButton btn : buttons) {
+    // Button color
+    Color buttonColor = Color.decode("#2b643b");
+    RoundedButton[] buttons = {signInButton, signUpButton, backButton};
+    for (RoundedButton btn : buttons) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
-        btn.setOpaque(true);
+
+        // -----------------------------
+        // ⭐ CHANGE BUTTON SIZE HERE ⭐
+        // -----------------------------
+        btn.setPreferredSize(new Dimension(350, 60));  
+        // just change 350 = width, 60 = height
+
+        // -----------------------------
+        // ⭐ CHANGE ROUNDNESS HERE ⭐
+        // -----------------------------
+        btn.setCornerRadius(25); 
+        // higher = more round
     }
 
     signInButton.addActionListener(e -> signIn());
@@ -268,9 +283,11 @@ private void initializeStudentPanel() {
     gbc.gridx = 0;
     gbc.anchor = GridBagConstraints.CENTER;
 
-    // Horizontal and vertical positioning
-    int horizontalOffset = 600; // positive → move right, negative → move left
-    int verticalOffset = 90;    // positive → move down, negative → move up
+    // -----------------------------
+    // ⭐ POSITION ADJUSTMENT ⭐
+    // -----------------------------
+    int horizontalOffset = 600; // positive → move RIGHT, negative → move LEFT
+    int verticalOffset = 90;    // positive → move DOWN, negative → move UP
 
     // Message box
     gbc.gridy = 0;
@@ -304,7 +321,7 @@ private void initializeAdminPanel() {
     // WELCOME MESSAGE BOX
     // ---------------------------------------------------------
     JPanel messageBox = new JPanel(new GridBagLayout());
-    messageBox.setBackground(new Color(0, 0, 0, 150)); // semi-transparent black
+    messageBox.setBackground(new Color(0, 0, 0, 150));
     messageBox.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
     JLabel titleLabel = new JLabel("<html><center>Welcome to the Admin System</center></html>");
@@ -316,7 +333,7 @@ private void initializeAdminPanel() {
     // USERNAME & PASSWORD BOXES
     // ---------------------------------------------------------
     JPanel userBox = new JPanel(new GridBagLayout());
-    userBox.setBackground(new Color(0, 0, 0, 120)); // slightly transparent
+    userBox.setBackground(new Color(0, 0, 0, 120));
     userBox.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
     JLabel userLabel = new JLabel("Username: ");
@@ -354,27 +371,33 @@ private void initializeAdminPanel() {
     passBox.add(passwordField, gbcPass);
 
     // ---------------------------------------------------------
-    // BUTTONS
+    // ROUNDED BUTTONS
     // ---------------------------------------------------------
-    JButton loginButton = createStyledButton("Login");
-    JButton backButton = createStyledButton("Back");
+    RoundedButton loginButton = new RoundedButton("Login");
+    RoundedButton backButton = new RoundedButton("Back");
 
     Color buttonColor = Color.decode("#2b643b");
-    JButton[] buttons = {loginButton, backButton};
-    for (JButton btn : buttons) {
+    RoundedButton[] buttons = {loginButton, backButton};
+
+    for (RoundedButton btn : buttons) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
-        btn.setOpaque(true);
+
+        // ⭐ EDIT BUTTON SIZE HERE ⭐
+        btn.setPreferredSize(new Dimension(250, 55));
+
+        // ⭐ EDIT ROUNDNESS HERE ⭐
+        btn.setCornerRadius(25);
     }
 
     // ---------------------------------------------------------
-    // GRIDBAG CONSTRAINTS FOR MAIN PANEL
+    // GRIDBAG FOR MAIN PANEL
     // ---------------------------------------------------------
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.anchor = GridBagConstraints.CENTER;
 
-    int horizontalOffset = 100; // move right
-    int verticalOffset = 20;    // move down
+    int horizontalOffset = 100; 
+    int verticalOffset = 20;
 
     // Welcome message
     gbc.gridx = 0;
@@ -383,8 +406,6 @@ private void initializeAdminPanel() {
     gbc.insets = new Insets(20 + verticalOffset, horizontalOffset, 20, 100);
     adminPanel.add(messageBox, gbc);
 
-    gbc.gridwidth = 2;
-
     // Username box
     gbc.gridy = 1;
     gbc.insets = new Insets(15, horizontalOffset, 15, 100);
@@ -392,7 +413,6 @@ private void initializeAdminPanel() {
 
     // Password box
     gbc.gridy = 2;
-    gbc.insets = new Insets(15, horizontalOffset, 15, 100);
     adminPanel.add(passBox, gbc);
 
     // Buttons
@@ -424,49 +444,84 @@ private void initializeAdminPanel() {
     backButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
 }
 
-    private void initializeProgramMenuPanel() {
-        programMenuPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                ImageIcon bg = new ImageIcon(getClass().getResource("acc_bg.jpeg"));
-                g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
-            }
-        };
-        programMenuPanel.setLayout(new GridBagLayout());
+private void initializeProgramMenuPanel() {
+    programMenuPanel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ImageIcon bg = new ImageIcon(getClass().getResource("acc_bg.jpeg"));
+            g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+    programMenuPanel.setLayout(new GridBagLayout());
 
-        JButton addIncomeButton = createStyledButton("Add Income");
-        JButton addExpenseButton = createStyledButton("Add Expense");
-        JButton viewHistoryButton = createStyledButton("View History");
-        JButton viewSummaryButton = createStyledButton("View Summary");
-        JButton getSuggestionsButton = createStyledButton("Get Suggestions");
-        JButton exitButton = createStyledButton("Exit");
+    // ---------------------------------------------------------
+    // MESSAGE BOX PANEL
+    // ---------------------------------------------------------
+    JPanel messageBox = new JPanel(new GridBagLayout());
+    messageBox.setBackground(new Color(0, 0, 0, 150)); // semi-transparent
+    messageBox.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
-        addIncomeButton.addActionListener(e -> addIncome());
-        addExpenseButton.addActionListener(e -> addExpense());
-        viewHistoryButton.addActionListener(e -> viewHistory());
-        viewSummaryButton.addActionListener(e -> viewSummary());
-        getSuggestionsButton.addActionListener(e -> getSuggestions());
-        exitButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
+    JLabel label = new JLabel("<html><center>Welcome!<br>Select an option</center></html>");
+    label.setFont(new Font("Arial", Font.BOLD, 25));
+    label.setForeground(Color.WHITE);
+    messageBox.add(label);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        programMenuPanel.add(addIncomeButton, gbc);
-        gbc.gridy = 1;
-        programMenuPanel.add(addExpenseButton, gbc);
-        gbc.gridy = 2;
-        programMenuPanel.add(viewHistoryButton, gbc);
-        gbc.gridy = 3;
-        programMenuPanel.add(viewSummaryButton, gbc);
-        gbc.gridy = 4;
-        programMenuPanel.add(getSuggestionsButton, gbc);
-        gbc.gridy = 5;
-        programMenuPanel.add(exitButton, gbc);
+    // ---------------------------------------------------------
+    // ROUNDED BUTTONS MATCHING USERROLE PANEL
+    // ---------------------------------------------------------
+    Color buttonColor = Color.decode("#2b643b"); // same as UserRole buttons
+    RoundedButton addIncomeButton = new RoundedButton("Add Income");
+    RoundedButton addExpenseButton = new RoundedButton("Add Expense");
+    RoundedButton viewHistoryButton = new RoundedButton("View History");
+    RoundedButton viewSummaryButton = new RoundedButton("View Summary");
+    RoundedButton getSuggestionsButton = new RoundedButton("Get Suggestions");
+    RoundedButton exitButton = new RoundedButton("Exit");
+
+    RoundedButton[] buttons = {addIncomeButton, addExpenseButton, viewHistoryButton,
+                               viewSummaryButton, getSuggestionsButton, exitButton};
+
+    for (RoundedButton btn : buttons) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setCornerRadius(25);
+        btn.setOpaque(false);
     }
 
+    // ---------------------------------------------------------
+    // Actions
+    // ---------------------------------------------------------
+    addIncomeButton.addActionListener(e -> addIncome());
+    addExpenseButton.addActionListener(e -> addExpense());
+    viewHistoryButton.addActionListener(e -> viewHistory());
+    viewSummaryButton.addActionListener(e -> viewSummary());
+    getSuggestionsButton.addActionListener(e -> getSuggestions());
+    exitButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
+
+    // ---------------------------------------------------------
+    // GRIDBAG CONSTRAINTS & ADD TO PANEL
+    // ---------------------------------------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.anchor = GridBagConstraints.CENTER;
+
+    // Message box first
+    gbc.gridy = 0;
+    gbc.insets = new Insets(20, 0, 20, 0);
+    programMenuPanel.add(messageBox, gbc);
+
+    // Buttons
+    for (int i = 0; i < buttons.length; i++) {
+        gbc.gridy = i + 1; // start after message box
+        gbc.insets = new Insets(20, 0, 20, 0);
+        programMenuPanel.add(buttons[i], gbc);
+    }
+}
+
 private void signIn() {
+    // -------------------------------
+    // Sign-in panel
+    // -------------------------------
     JPanel signInPanel = new JPanel(new GridBagLayout()) {
         @Override
         protected void paintComponent(Graphics g) {
@@ -475,48 +530,60 @@ private void signIn() {
         }
     };
 
+    // -------------------------------
     // Welcome message
-    JLabel welcomeLabel = new JLabel("✨ Welcome Back! Sign in to continue ✨");
+    // -------------------------------
+    JLabel welcomeLabel = new JLabel("Welcome Back! Sign in to continue");
     welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
-    welcomeLabel.setForeground(Color.CYAN);
+    welcomeLabel.setForeground(Color.BLACK);
 
-    // Username
-    JLabel userLabel = new JLabel("👤 Username:");
-    userLabel.setFont(new Font("Arial", Font.BOLD, 24));
-    userLabel.setForeground(new Color(168, 255, 96));
-    JTextField usernameField = new JTextField(20);
+    // -------------------------------
+    // Rounded Labels
+    // -------------------------------
+    RoundedLabel userLabel = new RoundedLabel("Username:");
+    userLabel.setBackground(Color.decode("#2b643b"));
+
+    RoundedLabel passLabel = new RoundedLabel("Password:");
+    passLabel.setBackground(Color.decode("#2b643b"));
+
+    // -------------------------------
+    // Rounded Text Fields
+    // -------------------------------
+    RoundedTextField usernameField = new RoundedTextField(20);
     usernameField.setBackground(new Color(255, 255, 255, 220));
     usernameField.setForeground(Color.BLACK);
-    usernameField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
 
-    // Password
-    JLabel passLabel = new JLabel("🔒 Password:");
-    passLabel.setFont(new Font("Arial", Font.BOLD, 24));
-    passLabel.setForeground(new Color(168, 255, 96));
-    JPasswordField passwordField = new JPasswordField(20);
+    RoundedPasswordField passwordField = new RoundedPasswordField(20);
     passwordField.setBackground(new Color(255, 255, 255, 220));
     passwordField.setForeground(Color.BLACK);
-    passwordField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
 
-    // Buttons
-    JButton submitButton = createStyledButton("Sign In ✅");
-    JButton cancelButton = createStyledButton("Cancel ❌");
+    // -------------------------------
+    // Rounded Buttons
+    // -------------------------------
+    RoundedButton submitButton = new RoundedButton("Sign In");
+    RoundedButton cancelButton = new RoundedButton("Cancel");
     Color buttonColor = Color.decode("#2b643b");
-    for (JButton btn : new JButton[]{submitButton, cancelButton}) {
+
+    for (RoundedButton btn : new RoundedButton[]{submitButton, cancelButton}) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
-        btn.setOpaque(true);
+        btn.setCornerRadius(25);
+        btn.setOpaque(false);
     }
 
+    // -------------------------------
     // Layout
+    // -------------------------------
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.anchor = GridBagConstraints.CENTER;
     int hOffset = 50, vOffset = 20;
 
+    // Welcome label
     gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
     gbc.insets = new Insets(10 + vOffset, hOffset, 20, 10);
     signInPanel.add(welcomeLabel, gbc);
 
+    // Username
     gbc.gridwidth = 1; gbc.gridy = 1; gbc.gridx = 0;
     gbc.insets = new Insets(5, hOffset, 5, 5);
     signInPanel.add(userLabel, gbc);
@@ -524,6 +591,7 @@ private void signIn() {
     gbc.insets = new Insets(5, 5, 5, hOffset);
     signInPanel.add(usernameField, gbc);
 
+    // Password
     gbc.gridy = 2; gbc.gridx = 0;
     gbc.insets = new Insets(5, hOffset, 5, 5);
     signInPanel.add(passLabel, gbc);
@@ -531,6 +599,7 @@ private void signIn() {
     gbc.insets = new Insets(5, 5, 5, hOffset);
     signInPanel.add(passwordField, gbc);
 
+    // Buttons
     gbc.gridy = 3; gbc.gridx = 0;
     gbc.insets = new Insets(15, hOffset, 15, 5);
     signInPanel.add(submitButton, gbc);
@@ -538,12 +607,17 @@ private void signIn() {
     gbc.insets = new Insets(15, 5, 15, hOffset);
     signInPanel.add(cancelButton, gbc);
 
+    // -------------------------------
     // Dialog
+    // -------------------------------
     JDialog dialog = new JDialog(frame, "Sign In", true);
     dialog.getContentPane().add(signInPanel);
     dialog.pack();
     dialog.setLocationRelativeTo(frame);
 
+    // -------------------------------
+    // Actions
+    // -------------------------------
     submitButton.addActionListener(e -> {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
@@ -552,66 +626,82 @@ private void signIn() {
             dialog.dispose();
             cardLayout.show(mainPanel, "Program Menu");
         } else {
-            JOptionPane.showMessageDialog(dialog, "Incorrect username or password ❌", "Error",
+            JOptionPane.showMessageDialog(dialog, "Incorrect username or password", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     });
 
     cancelButton.addActionListener(e -> dialog.dispose());
+
     dialog.setVisible(true);
 }
 
 private void signUp() {
+    // -------------------------------
+    // Sign-up panel
+    // -------------------------------
     JPanel signUpPanel = new JPanel(new GridBagLayout()) {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            setOpaque(false);
+            setOpaque(false); // allow parent background to show
         }
     };
 
+    // -------------------------------
     // Welcome message
-    JLabel welcomeLabel = new JLabel("✨ Join Us! Create your account below ✨");
+    // -------------------------------
+    JLabel welcomeLabel = new JLabel("Join Us! Create your account below");
     welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
-    welcomeLabel.setForeground(Color.CYAN);
+    welcomeLabel.setForeground(Color.BLACK);
 
-    // Username
-    JLabel userLabel = new JLabel("👤 New Username:");
-    userLabel.setFont(new Font("Arial", Font.BOLD, 24));
-    userLabel.setForeground(new Color(168, 255, 96));
-    JTextField usernameField = new JTextField(20);
+    // -------------------------------
+    // Rounded Labels
+    // -------------------------------
+    RoundedLabel userLabel = new RoundedLabel("New Username:");
+    userLabel.setBackground(Color.decode("#2b643b"));
+
+    RoundedLabel passLabel = new RoundedLabel("New Password:");
+    passLabel.setBackground(Color.decode("#2b643b"));
+
+    // -------------------------------
+    // Rounded Text Fields
+    // -------------------------------
+    RoundedTextField usernameField = new RoundedTextField(20);
     usernameField.setBackground(new Color(255, 255, 255, 220));
     usernameField.setForeground(Color.BLACK);
-    usernameField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
 
-    // Password
-    JLabel passLabel = new JLabel("🔒 New Password:");
-    passLabel.setFont(new Font("Arial", Font.BOLD, 24));
-    passLabel.setForeground(new Color(168, 255, 96));
-    JPasswordField passwordField = new JPasswordField(20);
+    RoundedPasswordField passwordField = new RoundedPasswordField(20);
     passwordField.setBackground(new Color(255, 255, 255, 220));
     passwordField.setForeground(Color.BLACK);
-    passwordField.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
 
-    // Buttons
-    JButton submitButton = createStyledButton("Sign Up ✅");
-    JButton cancelButton = createStyledButton("Cancel ❌");
+    // -------------------------------
+    // Rounded Buttons
+    // -------------------------------
+    RoundedButton submitButton = new RoundedButton("Sign Up");
+    RoundedButton cancelButton = new RoundedButton("Cancel");
     Color buttonColor = Color.decode("#2b643b");
-    for (JButton btn : new JButton[]{submitButton, cancelButton}) {
+
+    for (RoundedButton btn : new RoundedButton[]{submitButton, cancelButton}) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
-        btn.setOpaque(true);
+        btn.setCornerRadius(25);
+        btn.setOpaque(false);
     }
 
+    // -------------------------------
     // Layout
+    // -------------------------------
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.anchor = GridBagConstraints.CENTER;
     int hOffset = 50, vOffset = 20;
 
+    // Welcome label
     gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
     gbc.insets = new Insets(10 + vOffset, hOffset, 20, 10);
     signUpPanel.add(welcomeLabel, gbc);
 
+    // Username
     gbc.gridwidth = 1; gbc.gridy = 1; gbc.gridx = 0;
     gbc.insets = new Insets(5, hOffset, 5, 5);
     signUpPanel.add(userLabel, gbc);
@@ -619,6 +709,7 @@ private void signUp() {
     gbc.insets = new Insets(5, 5, 5, hOffset);
     signUpPanel.add(usernameField, gbc);
 
+    // Password
     gbc.gridy = 2; gbc.gridx = 0;
     gbc.insets = new Insets(5, hOffset, 5, 5);
     signUpPanel.add(passLabel, gbc);
@@ -626,6 +717,7 @@ private void signUp() {
     gbc.insets = new Insets(5, 5, 5, hOffset);
     signUpPanel.add(passwordField, gbc);
 
+    // Buttons
     gbc.gridy = 3; gbc.gridx = 0;
     gbc.insets = new Insets(15, hOffset, 15, 5);
     signUpPanel.add(submitButton, gbc);
@@ -633,128 +725,301 @@ private void signUp() {
     gbc.insets = new Insets(15, 5, 15, hOffset);
     signUpPanel.add(cancelButton, gbc);
 
+    // -------------------------------
     // Dialog
+    // -------------------------------
     JDialog dialog = new JDialog(frame, "Sign Up", true);
     dialog.getContentPane().add(signUpPanel);
     dialog.pack();
     dialog.setLocationRelativeTo(frame);
 
+    // -------------------------------
+    // Actions
+    // -------------------------------
     submitButton.addActionListener(e -> {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
         if (registerUser(username, password)) {
-            JOptionPane.showMessageDialog(dialog, "Sign-up successful! 🎉 You can now sign in.");
+            JOptionPane.showMessageDialog(dialog, "Sign-up successful! You can now sign in.");
             dialog.dispose();
         } else {
-            JOptionPane.showMessageDialog(dialog, "Username already exists ❌. Please try again.", "Error",
+            JOptionPane.showMessageDialog(dialog, "Username already exists. Please try again.", "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     });
 
     cancelButton.addActionListener(e -> dialog.dispose());
+
     dialog.setVisible(true);
 }
 
-
-    private void addIncome() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Income Source
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(new JLabel("Income Source:"), gbc);
-
-        gbc.gridx = 1;
-        JComboBox<String> sourceCombo = new JComboBox<>(new String[] { "Salary", "Bonus", "Freelance", "Other" });
-        sourceCombo.setEditable(true); // user can type or select
-        panel.add(sourceCombo, gbc);
-
-        // Income Amount
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(new JLabel("Income Amount:"), gbc);
-
-        gbc.gridx = 1;
-        JPanel amountPanel = new JPanel(new BorderLayout());
-        JLabel pesoLabel = new JLabel("₱ ");
-        JTextField amountField = new JTextField();
-        amountPanel.add(pesoLabel, BorderLayout.WEST);
-        amountPanel.add(amountField, BorderLayout.CENTER);
-        panel.add(amountPanel, gbc);
-
-        // Show dialog
-        int result = JOptionPane.showConfirmDialog(frame, panel, "Add Income",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if (result == JOptionPane.OK_OPTION) {
-            String source = sourceCombo.getEditor().getItem().toString().trim();
-            String amountStr = amountField.getText().trim();
-
-            try {
-                float amount = Float.parseFloat(amountStr);
-                // Format to 2 decimal places
-                amount = Float.parseFloat(String.format("%.2f", amount));
-
-                writeUserData(currentUser, amount, source, "Income");
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(frame, "Invalid amount entered.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+private void addIncome() {
+    // -------------------------------
+    // Add Income panel
+    // -------------------------------
+    JPanel incomePanel = new JPanel(new GridBagLayout()) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            setOpaque(false);
         }
+    };
+
+    // -------------------------------
+    // Welcome message
+    // -------------------------------
+    JLabel welcomeLabel = new JLabel("Add Your Income");
+    welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
+    welcomeLabel.setForeground(Color.BLACK);
+
+    // -------------------------------
+    // Rounded Labels
+    // -------------------------------
+    RoundedLabel sourceLabel = new RoundedLabel("Income Source:");
+    sourceLabel.setBackground(Color.decode("#2b643b"));
+
+    RoundedLabel amountLabel = new RoundedLabel("Income Amount:");
+    amountLabel.setBackground(Color.decode("#2b643b"));
+
+    // -------------------------------
+    // Rounded Inputs
+    // -------------------------------
+JComboBox<String> sourceCombo = new JComboBox<>(new String[]{"Allowance","Part-Time Job","Freelance","Scholarship/Grant","Internship Stipend",
+    "Business/Side Hustle","Commission","Tutoring","Project-Based Income","Gift/Donation"});    
+    sourceCombo.setEditable(true);
+    sourceCombo.setBackground(new Color(255, 255, 255, 220));
+    sourceCombo.setForeground(Color.BLACK);
+    sourceCombo.setFont(new Font("Arial", Font.PLAIN, 18));
+
+    // Amount field with peso symbol
+    JPanel amountFieldPanel = new JPanel(new BorderLayout());
+    amountFieldPanel.setOpaque(false);
+    JLabel pesoLabel = new JLabel("₱ ");
+    pesoLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    pesoLabel.setForeground(Color.BLACK);
+
+    RoundedTextField amountField = new RoundedTextField(20); // width adjustable here
+    amountField.setBackground(new Color(255, 255, 255, 220));
+    amountField.setForeground(Color.BLACK);
+
+    amountFieldPanel.add(pesoLabel, BorderLayout.WEST);
+    amountFieldPanel.add(amountField, BorderLayout.CENTER);
+
+    // -------------------------------
+    // Rounded Buttons
+    // -------------------------------
+    RoundedButton okButton = new RoundedButton("OK");
+    RoundedButton cancelButton = new RoundedButton("Cancel");
+    Color buttonColor = Color.decode("#2b643b");
+
+    for (RoundedButton btn : new RoundedButton[]{okButton, cancelButton}) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setCornerRadius(25);
+        btn.setOpaque(false);
     }
 
-    private void addExpense() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+    // -------------------------------
+    // Layout
+    // -------------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.CENTER;
+    int hOffset = 50, vOffset = 20;
 
-        // Expense Source
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(new JLabel("Expense Source:"), gbc);
+    // Welcome label
+    gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+    gbc.insets = new Insets(10 + vOffset, hOffset, 20, 10);
+    incomePanel.add(welcomeLabel, gbc);
 
-        gbc.gridx = 1;
-        JComboBox<String> sourceCombo = new JComboBox<>(new String[] { "Food", "Transportation", "Bills", "Other" });
-        sourceCombo.setEditable(true); // user can type or select
-        panel.add(sourceCombo, gbc);
+    // Source label & combo
+    gbc.gridwidth = 1; gbc.gridy = 1; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
+    incomePanel.add(sourceLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, hOffset);
+    incomePanel.add(sourceCombo, gbc);
 
-        // Expense Amount
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(new JLabel("Expense Amount:"), gbc);
+    // Amount label & field panel
+    gbc.gridy = 2; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
+    incomePanel.add(amountLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, hOffset);
+    incomePanel.add(amountFieldPanel, gbc);
 
-        gbc.gridx = 1;
-        JPanel amountPanel = new JPanel(new BorderLayout());
-        JLabel pesoLabel = new JLabel("₱ ");
-        JTextField amountField = new JTextField();
-        amountPanel.add(pesoLabel, BorderLayout.WEST);
-        amountPanel.add(amountField, BorderLayout.CENTER);
-        panel.add(amountPanel, gbc);
+    // Buttons
+    gbc.gridy = 3; gbc.gridx = 0;
+    gbc.insets = new Insets(15, hOffset, 15, 5);
+    incomePanel.add(okButton, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(15, 5, 15, hOffset);
+    incomePanel.add(cancelButton, gbc);
 
-        // Show dialog
-        int result = JOptionPane.showConfirmDialog(frame, panel, "Add Expense",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    // -------------------------------
+    // Dialog
+    // -------------------------------
+    JDialog dialog = new JDialog(frame, "Add Income", true);
+    dialog.getContentPane().add(incomePanel);
+    dialog.pack();
+    dialog.setLocationRelativeTo(frame);
 
-        if (result == JOptionPane.OK_OPTION) {
-            String source = sourceCombo.getEditor().getItem().toString().trim();
-            String amountStr = amountField.getText().trim();
+    // -------------------------------
+    // Actions
+    // -------------------------------
+    okButton.addActionListener(e -> {
+        String source = sourceCombo.getEditor().getItem().toString().trim();
+        String amountStr = amountField.getText().trim();
 
-            try {
-                float amount = Float.parseFloat(amountStr);
-                // Format to 2 decimal places
-                amount = Float.parseFloat(String.format("%.2f", amount));
-
-                writeUserData(currentUser, amount, source, "Expense");
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(frame, "Invalid amount entered.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        try {
+            float amount = Float.parseFloat(amountStr);
+            amount = Float.parseFloat(String.format("%.2f", amount));
+            writeUserData(currentUser, amount, source, "Income");
+            dialog.dispose();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(dialog, "Invalid amount entered.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
+    });
+
+    cancelButton.addActionListener(e -> dialog.dispose());
+
+    dialog.setVisible(true);
+}
+
+private void addExpense() {
+    // -------------------------------
+    // Add Expense panel
+    // -------------------------------
+    JPanel expensePanel = new JPanel(new GridBagLayout()) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            setOpaque(false);
+        }
+    };
+
+    // -------------------------------
+    // Welcome message
+    // -------------------------------
+    JLabel welcomeLabel = new JLabel("Add Your Expense");
+    welcomeLabel.setFont(new Font("Arial", Font.BOLD, 28));
+    welcomeLabel.setForeground(Color.BLACK);
+
+    // -------------------------------
+    // Rounded Labels
+    // -------------------------------
+    RoundedLabel sourceLabel = new RoundedLabel("Expense Source:");
+    sourceLabel.setBackground(Color.decode("#2b643b"));
+
+    RoundedLabel amountLabel = new RoundedLabel("Expense Amount:");
+    amountLabel.setBackground(Color.decode("#2b643b"));
+
+    // -------------------------------
+    // Rounded Inputs
+    // -------------------------------
+    JComboBox<String> sourceCombo = new JComboBox<>(new String[]{"Food","Transportation","School Supplies","Tuition/Fees","Bills/Utilities",
+    "Rent/Boarding","Shopping","Entertainment","Healthcare","Personal Care","Subscriptions","Travel/Trips"});
+    sourceCombo.setEditable(true);
+    sourceCombo.setBackground(new Color(255, 255, 255, 220));
+    sourceCombo.setForeground(Color.BLACK);
+    sourceCombo.setFont(new Font("Arial", Font.PLAIN, 18));
+
+    // Amount field with peso symbol
+    JPanel amountFieldPanel = new JPanel(new BorderLayout());
+    amountFieldPanel.setOpaque(false);
+    JLabel pesoLabel = new JLabel("₱ ");
+    pesoLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    pesoLabel.setForeground(Color.BLACK);
+
+    RoundedTextField amountField = new RoundedTextField(20); // width adjustable
+    amountField.setBackground(new Color(255, 255, 255, 220));
+    amountField.setForeground(Color.BLACK);
+
+    amountFieldPanel.add(pesoLabel, BorderLayout.WEST);
+    amountFieldPanel.add(amountField, BorderLayout.CENTER);
+
+    // -------------------------------
+    // Rounded Buttons
+    // -------------------------------
+    RoundedButton okButton = new RoundedButton("OK");
+    RoundedButton cancelButton = new RoundedButton("Cancel");
+    Color buttonColor = Color.decode("#2b643b");
+
+    for (RoundedButton btn : new RoundedButton[]{okButton, cancelButton}) {
+        btn.setBackground(buttonColor);
+        btn.setForeground(Color.WHITE);
+        btn.setCornerRadius(25);
+        btn.setOpaque(false);
     }
 
-    private void writeUserData(String username, float amount, String source, String type) {
+    // -------------------------------
+    // Layout
+    // -------------------------------
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.CENTER;
+    int hOffset = 50, vOffset = 20;
+
+    // Welcome label
+    gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+    gbc.insets = new Insets(10 + vOffset, hOffset, 20, 10);
+    expensePanel.add(welcomeLabel, gbc);
+
+    // Source label & combo
+    gbc.gridwidth = 1; gbc.gridy = 1; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
+    expensePanel.add(sourceLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, hOffset);
+    expensePanel.add(sourceCombo, gbc);
+
+    // Amount label & field panel
+    gbc.gridy = 2; gbc.gridx = 0;
+    gbc.insets = new Insets(5, hOffset, 5, 5);
+    expensePanel.add(amountLabel, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(5, 5, 5, hOffset);
+    expensePanel.add(amountFieldPanel, gbc);
+
+    // Buttons
+    gbc.gridy = 3; gbc.gridx = 0;
+    gbc.insets = new Insets(15, hOffset, 15, 5);
+    expensePanel.add(okButton, gbc);
+    gbc.gridx = 1;
+    gbc.insets = new Insets(15, 5, 15, hOffset);
+    expensePanel.add(cancelButton, gbc);
+
+    // -------------------------------
+    // Dialog
+    // -------------------------------
+    JDialog dialog = new JDialog(frame, "Add Expense", true);
+    dialog.getContentPane().add(expensePanel);
+    dialog.pack();
+    dialog.setLocationRelativeTo(frame);
+
+    // -------------------------------
+    // Actions
+    // -------------------------------
+    okButton.addActionListener(e -> {
+        String source = sourceCombo.getEditor().getItem().toString().trim();
+        String amountStr = amountField.getText().trim();
+
+        try {
+            float amount = Float.parseFloat(amountStr);
+            amount = Float.parseFloat(String.format("%.2f", amount));
+            writeUserData(currentUser, amount, source, "Expense");
+            dialog.dispose();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(dialog, "Invalid amount entered.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    cancelButton.addActionListener(e -> dialog.dispose());
+
+    dialog.setVisible(true);
+}
+
+private void writeUserData(String username, float amount, String source, String type) {
         String filename = username + ".txt";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename, true))) {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -768,7 +1033,10 @@ private void signUp() {
     }
 
 private void adminMenu() {
-    JPanel adminMenu = new JPanel() {
+    // -------------------------------
+    // Admin Menu Panel with Background
+    // -------------------------------
+    JPanel adminMenuPanel = new JPanel() {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -776,60 +1044,74 @@ private void adminMenu() {
             g.drawImage(bg.getImage(), 0, 0, getWidth(), getHeight(), this);
         }
     };
-    adminMenu.setLayout(new GridBagLayout());
+    adminMenuPanel.setLayout(new GridBagLayout());
 
-    // ---------------------------------------------------------
-    // BUTTONS
-    // ---------------------------------------------------------
-    JButton viewUserDataButton = createStyledButton("View User Data");
-    JButton editUserDataButton = createStyledButton("Edit User Data");
-    JButton removeUserDataButton = createStyledButton("Remove User Data");
-    JButton adminExitButton = createStyledButton("Exit");
+    // -------------------------------
+    // MESSAGE BOX PANEL
+    // -------------------------------
+    JPanel messageBox = new JPanel(new GridBagLayout());
+    messageBox.setBackground(new Color(0, 0, 0, 150)); // semi-transparent
+    messageBox.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
-    // Set button colors
+    JLabel label = new JLabel("<html><center>Welcome, Admin!<br>Select an action</center></html>");
+    label.setFont(new Font("Arial", Font.BOLD, 25));
+    label.setForeground(Color.WHITE);
+    messageBox.add(label);
+
+    // -------------------------------
+    // ROUNDED BUTTONS
+    // -------------------------------
     Color buttonColor = Color.decode("#2b643b");
-    JButton[] buttons = {viewUserDataButton, editUserDataButton, removeUserDataButton, adminExitButton};
-    for (JButton btn : buttons) {
+
+    RoundedButton viewUserDataButton = new RoundedButton("View User Data");
+    RoundedButton editUserDataButton = new RoundedButton("Edit User Data");
+    RoundedButton removeUserDataButton = new RoundedButton("Remove User Data");
+    RoundedButton adminExitButton = new RoundedButton("Exit");
+
+    RoundedButton[] buttons = {viewUserDataButton, editUserDataButton, removeUserDataButton, adminExitButton};
+
+    for (RoundedButton btn : buttons) {
         btn.setBackground(buttonColor);
         btn.setForeground(Color.WHITE);
-        btn.setOpaque(true);
+        btn.setCornerRadius(25);
+        btn.setOpaque(false);
     }
 
-    // Button actions
+    // -------------------------------
+    // BUTTON ACTIONS
+    // -------------------------------
     viewUserDataButton.addActionListener(e -> viewAllUsers());
     editUserDataButton.addActionListener(e -> editUserFile());
     removeUserDataButton.addActionListener(e -> removeUserFile());
     adminExitButton.addActionListener(e -> cardLayout.show(mainPanel, "User Role"));
 
-    // ---------------------------------------------------------
-    // GRIDBAG CONSTRAINTS
-    // ---------------------------------------------------------
+    // -------------------------------
+    // GRIDBAG CONSTRAINTS & ADD TO PANEL
+    // -------------------------------
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.anchor = GridBagConstraints.CENTER;
 
-    int horizontalOffset = 100; // move right
-    int verticalOffset = 20;    // move down
-    gbc.insets = new Insets(15 + verticalOffset, horizontalOffset, 15, 0);
-
-    // Add buttons to panel
+    // Message box first
     gbc.gridy = 0;
-    adminMenu.add(viewUserDataButton, gbc);
-    gbc.gridy = 1;
-    adminMenu.add(editUserDataButton, gbc);
-    gbc.gridy = 2;
-    adminMenu.add(removeUserDataButton, gbc);
-    gbc.gridy = 3;
-    adminMenu.add(adminExitButton, gbc);
+    gbc.insets = new Insets(20, 0, 20, 0);
+    adminMenuPanel.add(messageBox, gbc);
 
-    // ---------------------------------------------------------
+    // Buttons
+    for (int i = 0; i < buttons.length; i++) {
+        gbc.gridy = i + 1; // start after message box
+        gbc.insets = new Insets(20, 0, 20, 0);
+        adminMenuPanel.add(buttons[i], gbc);
+    }
+
+    // -------------------------------
     // Add to main panel and show
-    // ---------------------------------------------------------
-    mainPanel.add(adminMenu, "Admin Menu Actions");
+    // -------------------------------
+    mainPanel.add(adminMenuPanel, "Admin Menu Actions");
     cardLayout.show(mainPanel, "Admin Menu Actions");
 }
 
-    private void viewAllUsers() {
+private void viewAllUsers() {
         File usersFile = new File("users.txt");
 
         if (!usersFile.exists()) {
@@ -893,7 +1175,7 @@ private void adminMenu() {
         }
     }
 
-    private void viewIndividualUserData(String username) {
+private void viewIndividualUserData(String username) {
         File userFile = new File(username + ".txt");
         if (!userFile.exists()) {
             JOptionPane.showMessageDialog(frame, "User data not found for: " + username,
@@ -1021,7 +1303,7 @@ private void adminMenu() {
                 "Transaction Data of " + username, JOptionPane.PLAIN_MESSAGE);
     }
 
-    private void editUserFile() {
+private void editUserFile() {
         File usersFile = new File("users.txt");
 
         if (!usersFile.exists()) {
@@ -1246,7 +1528,7 @@ private void adminMenu() {
                 "Editing Transactions of " + usernameToEdit, JOptionPane.PLAIN_MESSAGE);
     }
 
-    private void saveTransactionTables(File userFile, JTable incomeTable, JTable expenseTable) {
+private void saveTransactionTables(File userFile, JTable incomeTable, JTable expenseTable) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(userFile))) {
             for (int i = 0; i < incomeTable.getRowCount(); i++) {
                 bw.write(incomeTable.getValueAt(i, 0) + "," +
@@ -1267,7 +1549,7 @@ private void adminMenu() {
         }
     }
 
-    private void removeUserFile() {
+private void removeUserFile() {
         File usersFile = new File("users.txt");
 
         if (!usersFile.exists()) {
@@ -1384,7 +1666,7 @@ private void adminMenu() {
         JOptionPane.showMessageDialog(frame, "User \"" + userToRemove + "\" successfully deleted.");
     }
 
-    private boolean authenticateUser(String username, String password) {
+private boolean authenticateUser(String username, String password) {
         try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -1399,7 +1681,7 @@ private void adminMenu() {
         return false;
     }
 
-    private boolean registerUser(String username, String password) {
+private boolean registerUser(String username, String password) {
         try (BufferedReader br = new BufferedReader(new FileReader("users.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -1421,7 +1703,7 @@ private void adminMenu() {
         return false;
     }
 
-    private void viewHistory() {
+private void viewHistory() {
         String filename = currentUser + ".txt";
         java.util.List<Object[]> allRows = new java.util.ArrayList<>();
 
@@ -1511,180 +1793,248 @@ private void adminMenu() {
                 JOptionPane.PLAIN_MESSAGE);
     }
 
-    private void viewSummary() {
-        String filename = currentUser + ".txt";
-        File file = new File(filename);
-        if (!file.exists()) {
-            JOptionPane.showMessageDialog(frame, "No data found for user.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+private void viewSummary() {
+    String filename = currentUser + ".txt";
+    File file = new File(filename);
+    if (!file.exists()) {
+        JOptionPane.showMessageDialog(frame, "No data found for user.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // -------------------------------
+    // Summary Frame
+    // -------------------------------
+    JFrame summaryFrame = new JFrame("Summary - " + currentUser);
+    summaryFrame.setSize(1200, 700);
+    summaryFrame.setLayout(new BorderLayout());
+
+    // -------------------------------
+    // Table Models (Editable)
+    // -------------------------------
+    DefaultTableModel incomeModel = new DefaultTableModel(new String[]{"Amount", "Category", "Date"}, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return column == 0 || column == 1; // allow editing Amount and Category
         }
+    };
+    DefaultTableModel expenseModel = new DefaultTableModel(new String[]{"Amount", "Category", "Date"}, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return column == 0 || column == 1; // allow editing Amount and Category
+        }
+    };
 
-        // FRAME
-        JFrame summaryFrame = new JFrame("Summary - " + currentUser);
-        summaryFrame.setSize(1200, 700);
-        summaryFrame.setLayout(new BorderLayout());
+    float totalIncome = 0, totalExpense = 0;
+    TreeMap<String, Float> incomeMonthly = new TreeMap<>();
+    TreeMap<String, Float> expenseMonthly = new TreeMap<>();
+    HashMap<String, Float> incomeMap = new HashMap<>();
+    HashMap<String, Float> expenseMap = new HashMap<>();
 
-        // TABLE MODELS
-        DefaultTableModel incomeModel = new DefaultTableModel(new String[] { "Amount", "Category", "Date" }, 0);
-        DefaultTableModel expenseModel = new DefaultTableModel(new String[] { "Amount", "Category", "Date" }, 0);
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] p = line.split(",");
+            if (p.length < 4) continue;
 
-        float totalIncome = 0, totalExpense = 0;
-        TreeMap<String, Float> incomeMonthly = new TreeMap<>();
-        TreeMap<String, Float> expenseMonthly = new TreeMap<>();
-        HashMap<String, Float> incomeMap = new HashMap<>();
-        HashMap<String, Float> expenseMap = new HashMap<>();
+            try {
+                float amount = Float.parseFloat(p[0]);
+                String category = p[1];
+                String type = p[2];
+                String date = p[3];
+                String monthKey = date.substring(3); // MM-YYYY
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] p = line.split(",");
-                if (p.length < 4)
-                    continue;
-
-                try {
-                    float amount = Float.parseFloat(p[0]);
-                    String category = p[1];
-                    String type = p[2];
-                    String date = p[3];
-
-                    String monthKey = date.substring(3); // MM-YYYY
-
-                    if (type.equalsIgnoreCase("Income")) {
-                        totalIncome += amount;
-                        incomeModel.addRow(new Object[] { amount, category, date });
-                        incomeMap.put(category, incomeMap.getOrDefault(category, 0f) + amount);
-                        incomeMonthly.put(monthKey, incomeMonthly.getOrDefault(monthKey, 0f) + amount);
-                    } else if (type.equalsIgnoreCase("Expense")) {
-                        totalExpense += amount;
-                        expenseModel.addRow(new Object[] { amount, category, date });
-                        expenseMap.put(category, expenseMap.getOrDefault(category, 0f) + amount);
-                        expenseMonthly.put(monthKey, expenseMonthly.getOrDefault(monthKey, 0f) + amount);
-                    }
-                } catch (NumberFormatException ex) {
-                    System.err.println("Skipping invalid line: " + line);
+                if (type.equalsIgnoreCase("Income")) {
+                    totalIncome += amount;
+                    incomeModel.addRow(new Object[]{amount, category, date});
+                    incomeMap.put(category, incomeMap.getOrDefault(category, 0f) + amount);
+                    incomeMonthly.put(monthKey, incomeMonthly.getOrDefault(monthKey, 0f) + amount);
+                } else if (type.equalsIgnoreCase("Expense")) {
+                    totalExpense += amount;
+                    expenseModel.addRow(new Object[]{amount, category, date});
+                    expenseMap.put(category, expenseMap.getOrDefault(category, 0f) + amount);
+                    expenseMonthly.put(monthKey, expenseMonthly.getOrDefault(monthKey, 0f) + amount);
                 }
+            } catch (NumberFormatException ex) {
+                System.err.println("Skipping invalid line: " + line);
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(frame, "Error loading summary.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
-
-        // ADD TOTAL ROWS
-        incomeModel.addRow(new Object[] { "", "TOTAL:", totalIncome });
-        expenseModel.addRow(new Object[] { "", "TOTAL:", totalExpense });
-
-        JTable incomeTable = new JTable(incomeModel);
-        JTable expenseTable = new JTable(expenseModel);
-
-        // Format tables: right-align amounts and bold totals
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        incomeTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
-        expenseTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
-
-        // Highlight TOTAL rows
-        incomeTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (row == table.getRowCount() - 1)
-                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-                return c;
-            }
-        });
-
-        expenseTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (row == table.getRowCount() - 1)
-                    c.setFont(c.getFont().deriveFont(Font.BOLD));
-                return c;
-            }
-        });
-
-        // PANELS
-        JPanel topPanel = new JPanel(new GridLayout(1, 3, 5, 5));
-        topPanel.add(new JScrollPane(incomeTable));
-        topPanel.add(new JScrollPane(expenseTable));
-
-        // Suggestions panel (resizable)
-        JInternalFrame suggestionFrame = new JInternalFrame("Suggestions", true, true, true, true);
-        suggestionFrame.setSize(300, 300);
-        suggestionFrame.setVisible(true);
-        JTextArea suggestionArea = new JTextArea();
-        suggestionArea.setEditable(false);
-        suggestionFrame.add(new JScrollPane(suggestionArea));
-        topPanel.add(suggestionFrame);
-
-        // Bottom panel for charts
-        JPanel bottomPanel = new JPanel(new GridLayout(1, 2, 5, 5));
-        bottomPanel.add(ChartHelper.createPieChartPanel(incomeMap, expenseMap));
-        bottomPanel.add(ChartHelper.createLineChartPanel(incomeMonthly, expenseMonthly));
-
-        // SPLIT PANE for adjustable layout
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, bottomPanel);
-        splitPane.setDividerLocation(350);
-        summaryFrame.add(splitPane, BorderLayout.CENTER);
-
-        summaryFrame.setVisible(true);
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(frame, "Error loading summary.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
     }
 
-    public class ChartHelper {
+    // -------------------------------
+    // Tables
+    // -------------------------------
+    JTable incomeTable = new JTable(incomeModel);
+    JTable expenseTable = new JTable(expenseModel);
+    incomeTable.setFillsViewportHeight(true);
+    expenseTable.setFillsViewportHeight(true);
 
-        @SuppressWarnings("unchecked")
-        public static JPanel createPieChartPanel(HashMap<String, Float> incomeMap, HashMap<String, Float> expenseMap) {
-            DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+    // Right-align Amount column
+    DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+    rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+    incomeTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
+    expenseTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
 
-            for (Map.Entry<String, Float> entry : incomeMap.entrySet()) {
-                dataset.setValue("Income - " + entry.getKey(), entry.getValue());
-            }
-            for (Map.Entry<String, Float> entry : expenseMap.entrySet()) {
-                dataset.setValue("Expense - " + entry.getKey(), entry.getValue());
-            }
+    // Total row bold
+    incomeModel.addRow(new Object[]{"", "TOTAL:", totalIncome});
+    expenseModel.addRow(new Object[]{"", "TOTAL:", totalExpense});
 
-            JFreeChart chart = org.jfree.chart.ChartFactory.createPieChart(
-                    "Income vs Expenses",
-                    dataset,
-                    true,
-                    true,
-                    false);
+    DefaultTableCellRenderer boldRenderer = new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (row == table.getRowCount() - 1) c.setFont(c.getFont().deriveFont(Font.BOLD));
+            return c;
+        }
+    };
+    for (int i = 0; i < incomeTable.getColumnCount(); i++) incomeTable.getColumnModel().getColumn(i).setCellRenderer(boldRenderer);
+    for (int i = 0; i < expenseTable.getColumnCount(); i++) expenseTable.getColumnModel().getColumn(i).setCellRenderer(boldRenderer);
 
-            PiePlot<String> plot = (PiePlot<String>) chart.getPlot();
-            plot.setSectionPaint("Income", new Color(79, 129, 189));
-            plot.setSectionPaint("Expense", new Color(192, 80, 77));
+    // -------------------------------
+    // Buttons to delete/edit rows
+    // -------------------------------
+    JButton deleteIncomeButton = new JButton("Delete Selected Income");
+    JButton deleteExpenseButton = new JButton("Delete Selected Expense");
 
-            return new ChartPanel(chart);
+    deleteIncomeButton.addActionListener(e -> {
+        int row = incomeTable.getSelectedRow();
+        if (row >= 0 && row != incomeTable.getRowCount() - 1) { // don't delete TOTAL
+            incomeModel.removeRow(row);
+        }
+    });
+
+    deleteExpenseButton.addActionListener(e -> {
+        int row = expenseTable.getSelectedRow();
+        if (row >= 0 && row != expenseTable.getRowCount() - 1) { // don't delete TOTAL
+            expenseModel.removeRow(row);
+        }
+    });
+
+    JPanel tablePanel = new JPanel(new GridLayout(2, 2, 10, 10));
+    tablePanel.setBackground(new Color(0, 0, 0, 0));
+    tablePanel.add(new JScrollPane(incomeTable));
+    tablePanel.add(new JScrollPane(expenseTable));
+    tablePanel.add(deleteIncomeButton);
+    tablePanel.add(deleteExpenseButton);
+
+    // -------------------------------
+    // Savings Panel (Pie Chart)
+    // -------------------------------
+    float savings = totalIncome - totalExpense;
+    JPanel savingsPanel = ChartHelper.createSavingsPieChartPanel(totalIncome, totalExpense);
+    savingsPanel.setBorder(BorderFactory.createTitledBorder("Savings Overview"));
+
+    // -------------------------------
+    // Monthly Income vs Expense Bar Chart
+    // -------------------------------
+    JPanel monthlyBarPanel = ChartHelper.createMonthlyIncomeExpenseBarChart(incomeMonthly, expenseMonthly);
+    monthlyBarPanel.setBorder(BorderFactory.createTitledBorder("Monthly Income vs Expense"));
+
+    // -------------------------------
+    // Main split pane
+    // -------------------------------
+    JSplitPane topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tablePanel, savingsPanel);
+    topSplit.setDividerLocation(700);
+
+    JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplit, monthlyBarPanel);
+    mainSplit.setDividerLocation(350);
+
+    summaryFrame.add(mainSplit, BorderLayout.CENTER);
+    summaryFrame.setLocationRelativeTo(frame);
+    summaryFrame.setVisible(true);
+}
+class ChartHelper {
+
+    // -------------------------------
+    // Income vs Expense Pie Chart
+    // -------------------------------
+    @SuppressWarnings("unchecked")
+    static JPanel createIncomeExpensePieChartPanel(HashMap<String, Float> incomeMap,
+                                                   HashMap<String, Float> expenseMap) {
+        DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+
+        for (Map.Entry<String, Float> entry : incomeMap.entrySet()) {
+            dataset.setValue("Income - " + entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, Float> entry : expenseMap.entrySet()) {
+            dataset.setValue("Expense - " + entry.getKey(), entry.getValue());
         }
 
-        public static JPanel createLineChartPanel(TreeMap<String, Float> incomeMonthly,
-                TreeMap<String, Float> expenseMonthly) {
-            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        JFreeChart chart = ChartFactory.createPieChart(
+                "Income vs Expenses",
+                dataset,
+                true,
+                true,
+                false
+        );
 
-            for (Map.Entry<String, Float> entry : incomeMonthly.entrySet()) {
-                dataset.addValue(entry.getValue(), "Income", entry.getKey());
-            }
-            for (Map.Entry<String, Float> entry : expenseMonthly.entrySet()) {
-                dataset.addValue(entry.getValue(), "Expense", entry.getKey());
-            }
+        PiePlot<String> plot = (PiePlot<String>) chart.getPlot();
+        plot.setSectionPaint("Income", new Color(79, 129, 189));
+        plot.setSectionPaint("Expense", new Color(192, 80, 77));
 
-            JFreeChart chart = org.jfree.chart.ChartFactory.createLineChart(
-                    "Monthly Income vs Expenses",
-                    "Month",
-                    "Amount",
-                    dataset,
-                    PlotOrientation.VERTICAL,
-                    true,
-                    true,
-                    false);
-
-            return new ChartPanel(chart);
-        }
+        return new ChartPanel(chart);
     }
 
-    private void getSuggestions() {
+    // -------------------------------
+    // Savings Pie Chart
+    // -------------------------------
+    static JPanel createSavingsPieChartPanel(float totalIncome, float totalExpense) {
+        float savings = totalIncome - totalExpense;
+        if (savings < 0) savings = 0;
+
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        dataset.setValue("Savings", savings);
+        dataset.setValue("Expenses", totalExpense);
+
+        JFreeChart chart = ChartFactory.createPieChart(
+                "Savings Overview",
+                dataset,
+                true,
+                true,
+                false
+        );
+
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setSectionPaint("Savings", new Color(79, 129, 189));
+        plot.setSectionPaint("Expenses", new Color(192, 80, 77));
+
+        return new ChartPanel(chart);
+    }
+
+    // -------------------------------
+    // Monthly Income vs Expense Bar Chart
+    // -------------------------------
+    static JPanel createMonthlyIncomeExpenseBarChart(TreeMap<String, Float> incomeMonthly,TreeMap<String, Float> expenseMonthly) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for (Map.Entry<String, Float> entry : incomeMonthly.entrySet()) {
+            dataset.addValue(entry.getValue(), "Income", entry.getKey());
+        }
+        for (Map.Entry<String, Float> entry : expenseMonthly.entrySet()) {
+            dataset.addValue(entry.getValue(), "Expense", entry.getKey());
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Monthly Income vs Expense",
+                "Month",
+                "Amount (₱)",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
+        );
+
+        return new ChartPanel(chart);
+    }
+}
+
+
+private void getSuggestions() {
 
         List<Object[]> incomeRows = getAllIncomeRows();
         List<Object[]> expenseRows = getAllExpenseRows();
@@ -1814,7 +2164,7 @@ private void adminMenu() {
 
     }
 
-    private void showStyledPanel(String title, String message, int x, int y) {
+private void showStyledPanel(String title, String message, int x, int y) {
 
         JDialog dialog = new JDialog(frame, title, false);
         dialog.setSize(400, 260);
@@ -1842,7 +2192,7 @@ private void adminMenu() {
         dialog.setVisible(true);
     }
 
-    private List<Object[]> getAllIncomeRows() {
+private List<Object[]> getAllIncomeRows() {
         List<Object[]> incomeList = new ArrayList<>();
         String filename = currentUser + ".txt";
 
@@ -1862,7 +2212,7 @@ private void adminMenu() {
         return incomeList;
     }
 
-    private List<Object[]> getAllExpenseRows() {
+private List<Object[]> getAllExpenseRows() {
         List<Object[]> expenseList = new ArrayList<>();
         String filename = currentUser + ".txt";
 
@@ -1882,12 +2232,12 @@ private void adminMenu() {
         return expenseList;
     }
 
-    private List<Object[]> getAllSavingsRows() {
+private List<Object[]> getAllSavingsRows() {
         // You said you do NOT store savings in file → return empty list
         return new ArrayList<>();
     }
 
-    private JButton createStyledButton(String text) {
+private JButton createStyledButton(String text) {
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -1922,7 +2272,121 @@ private void adminMenu() {
         return button;
     }
 
-    public static void main(String[] args) {
+public static void main(String[] args) {
         SwingUtilities.invokeLater(BudgetingSystem::new);
+    }
+}
+
+
+
+
+class RoundedButton extends JButton {
+
+    private int cornerRadius = 20; // Adjust roundness here
+
+    public RoundedButton(String text) {
+        super(text);
+        setContentAreaFilled(false);
+        setFocusPainted(false);
+        setBorderPainted(false);
+        setOpaque(false);
+        setForeground(Color.WHITE);
+        setFont(new Font("Arial", Font.BOLD, 25));
+        setPreferredSize(new Dimension(350, 50));
+    }
+
+    public void setCornerRadius(int radius) {
+        this.cornerRadius = radius;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Background
+        g2.setColor(getBackground());
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+
+        super.paintComponent(g);
+        g2.dispose();
+    }
+
+    @Override
+    public void paintBorder(Graphics g) {
+        // No border
+    }
+}
+
+class RoundedTextField extends JTextField {
+    private int cornerRadius = 25;
+
+    public RoundedTextField(int columns) {
+        super(columns);
+        setOpaque(false);
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(getBackground());
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+        super.paintComponent(g);
+        g2.dispose();
+    }
+}
+
+class RoundedPasswordField extends JPasswordField {
+    private int cornerRadius = 25;
+
+    public RoundedPasswordField(int columns) {
+        super(columns);
+        setOpaque(false);
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(getBackground());
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+        super.paintComponent(g);
+        g2.dispose();
+    }
+}
+
+class RoundedLabel extends JLabel {
+    private int cornerRadius = 25;
+
+    public RoundedLabel(String text) {
+        super(text);
+        setOpaque(false); // allow custom painting
+        setForeground(Color.WHITE);
+        setFont(new Font("Arial", Font.BOLD, 24));
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setVerticalAlignment(SwingConstants.CENTER);
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+    }
+
+    public void setCornerRadius(int radius) {
+        this.cornerRadius = radius;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draw rounded background
+        g2.setColor(getBackground());
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), cornerRadius, cornerRadius);
+
+        super.paintComponent(g);
+        g2.dispose();
     }
 }
